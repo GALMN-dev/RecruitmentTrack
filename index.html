@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recruitment Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .sidebar-link.active { background-color: #4f46e5; color: white; }
+    .candidate-card { transition: all 0.2s; }
+    .candidate-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+    .page { display: none; }
+    .page.active { display: flex; }
+    .role-card { transition: all 0.3s ease; border: 2px solid transparent; }
+    .role-card:hover { transform: translateY(-6px); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); }
+    body.role-pengaju .admin-only { display: none !important; }
+    .notif-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; background: #ef4444; color: white; font-size: 10px; font-weight: 700; border-radius: 9999px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+  </style>
+</head>
+<body class="bg-gray-50 role-pengaju">
+
+  <!-- LANDING -->
+  <div id="landingPage" class="page active min-h-screen items-center justify-center p-6" style="background: linear-gradient(145deg, #4f46e5 0%, #312e81 100%);">
+    <div class="w-full max-w-xl text-center">
+      <div class="mb-12">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-white/15 backdrop-blur-sm rounded-3xl mb-6 border border-white/20">
+          <i class="fas fa-users text-white text-4xl"></i>
+        </div>
+        <h1 class="text-4xl font-bold text-white tracking-tight">Recruitment Tracker</h1>
+        <p class="text-indigo-200 mt-3 text-base">Sistem Tracking Progress Rekrutmen</p>
+      </div>
+      <p class="text-white/70 text-sm mb-6 font-medium">Pilih peran Anda</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <button onclick="enterAsPengaju()" class="role-card bg-white rounded-2xl p-7 text-left group">
+          <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-indigo-100 transition">
+            <i class="fas fa-user text-indigo-600 text-2xl"></i>
+          </div>
+          <h3 class="font-bold text-gray-900 text-xl">Pengaju</h3>
+          <p class="text-sm text-gray-500 mt-2 leading-relaxed">Lihat progress rekrutmen dari lowongan yang diajukan</p>
+        </button>
+        <button onclick="showAdminLogin()" class="role-card bg-white rounded-2xl p-7 text-left group">
+          <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-emerald-100 transition">
+            <i class="fas fa-shield-alt text-emerald-600 text-2xl"></i>
+          </div>
+          <h3 class="font-bold text-gray-900 text-xl">Tim Rekrutmen</h3>
+          <p class="text-sm text-gray-500 mt-2 leading-relaxed">Kelola & update data kandidat serta progress</p>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN ADMIN -->
+  <div id="adminLoginPage" class="page min-h-screen items-center justify-center p-6" style="background: linear-gradient(145deg, #4f46e5 0%, #312e81 100%);">
+    <div class="w-full max-w-md">
+      <div class="bg-white rounded-3xl p-8 shadow-2xl">
+        <button onclick="backToLanding()" class="text-sm text-gray-400 hover:text-gray-600 mb-6 flex items-center gap-2 transition">
+          <i class="fas fa-arrow-left"></i> Kembali
+        </button>
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-14 h-14 bg-indigo-50 rounded-2xl mb-4">
+            <i class="fas fa-shield-alt text-indigo-600 text-2xl"></i>
+          </div>
+          <h2 class="font-bold text-gray-900 text-xl">Login Tim Rekrutmen</h2>
+          <p class="text-sm text-gray-500 mt-1">Masuk untuk mengelola data rekrutmen</p>
+        </div>
+        <div class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+            <input type="email" id="loginEmail" placeholder="Masukkan email" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+            <div class="relative">
+              <input type="password" id="loginPassword" placeholder="Masukkan password" class="w-full border border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <button type="button" onclick="toggleLoginPassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition p-1" title="Lihat password">
+                <i id="loginPasswordEye" class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <button onclick="loginAdmin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl text-sm font-semibold transition shadow-lg shadow-indigo-200">
+            Masuk ke Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="appPage" class="page h-screen overflow-hidden">
+    <div class="flex h-full w-full">
+      <!-- Sidebar -->
+      <aside class="w-64 bg-white border-r border-gray-100 flex flex-col shrink-0">
+        <div class="p-5 border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-200">
+              <i class="fas fa-users text-white"></i>
+            </div>
+            <div>
+              <h1 class="font-bold text-gray-900">Recruitment Tracker</h1>
+              <p class="text-xs text-gray-400">Copyright © 2026</p>
+            </div>
+          </div>
+        </div>
+        <nav class="flex-1 p-4 space-y-1">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">Menu Utama</p>
+          <a href="#" onclick="showPage('dashboard')" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-indigo-50 transition">
+            <i class="fas fa-chart-pie w-5 text-center"></i> Dashboard
+          </a>
+          <a href="#" onclick="showPage('lowongan')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-indigo-50 transition relative">
+            <i class="fas fa-briefcase w-5 text-center"></i> Lowongan
+            <span id="badgeLowongan" class="notif-badge hidden">0</span>
+          </a>
+          <a href="#" onclick="showPage('kandidat')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-indigo-50 transition">
+            <i class="fas fa-user-friends w-5 text-center"></i> Kandidat
+          </a>
+          <a href="#" onclick="showPage('pipeline')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-indigo-50 transition">
+            <i class="fas fa-stream w-5 text-center"></i> Pipeline
+          </a>
+          <a href="#" onclick="showPage('interview')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-indigo-50 transition relative">
+            <i class="fas fa-calendar-check w-5 text-center"></i> Jadwal Interview
+            <span id="badgeInterview" class="notif-badge hidden">0</span>
+          </a>
+        </nav>
+        <div class="p-4 border-t border-gray-100">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center">
+              <i class="fas fa-user text-indigo-600 text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate" id="userName">—</p>
+              <p class="text-xs text-gray-400" id="userRole">—</p>
+            </div>
+          </div>
+          <button onclick="logout()" class="w-full text-left text-xs text-red-500 hover:text-red-600 font-medium px-1 py-1 rounded hover:bg-red-50 transition">
+            <i class="fas fa-sign-out-alt mr-1.5"></i> Keluar
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <div class="flex-1 flex flex-col overflow-hidden bg-gray-50">
+        <header class="bg-white border-b border-gray-100 px-8 py-4 flex items-center justify-between shrink-0">
+          <div>
+            <h2 class="text-xl font-semibold text-gray-900" id="pageTitle">Dashboard</h2>
+            <p class="text-sm text-gray-400 mt-0.5" id="pageSubtitle">Ringkasan rekrutmen hari ini</p>
+          </div>
+          <div class="flex items-center gap-4">
+            <span id="roleBadge" class="px-3.5 py-1.5 rounded-full text-xs font-semibold">—</span>
+            <button class="relative p-2 text-gray-400 hover:text-gray-600 transition" onclick="showNotifPanel()">
+              <i class="fas fa-bell text-lg"></i>
+              <span id="bellBadge" class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+            </button>
+          </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-8">
+
+          <!-- DASHBOARD -->
+          <div id="page-dashboard" class="page-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+              <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-400">Lowongan Aktif</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" id="statLowongan">0</p>
+                  </div>
+                  <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-briefcase text-indigo-600 text-lg"></i>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-3 font-medium" id="statLowonganSub">Dari data spreadsheet</p>
+              </div>
+              <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-400">Total Kandidat</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" id="statKandidat">0</p>
+                  </div>
+                  <div class="w-12 h-12 bg-sky-50 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-users text-sky-600 text-lg"></i>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-3 font-medium" id="statKandidatSub">Dari data spreadsheet</p>
+              </div>
+              <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-400">Interview Bulan Ini</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" id="statInterview">0</p>
+                  </div>
+                  <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-calendar text-amber-600 text-lg"></i>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-3" id="statInterviewSub">Dari data spreadsheet</p>
+              </div>
+              <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-400">Hired Bulan Ini</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" id="statHired">0</p>
+                  </div>
+                  <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-user-check text-emerald-600 text-lg"></i>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-3 font-medium" id="statHiredSub">Dari data spreadsheet</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+                  <h3 class="font-semibold text-gray-900">Kandidat Terbaru</h3>
+                  <a href="#" onclick="showPage('kandidat')" class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">Lihat semua</a>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead class="bg-gray-50/80 text-gray-400">
+                      <tr>
+                        <th class="text-left px-6 py-3 font-medium">Nama</th>
+                        <th class="text-left px-6 py-3 font-medium">Posisi</th>
+                        <th class="text-left px-6 py-3 font-medium">Tahap</th>
+                        <th class="text-left px-6 py-3 font-medium">Tanggal</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50" id="dashboardKandidatBody">
+                      <!-- diisi JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-50">
+                  <h3 class="font-semibold text-gray-900">Interview Mendatang</h3>
+                </div>
+                <div class="p-5 space-y-4" id="dashboardInterviewList">
+                  <!-- diisi JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOWONGAN -->
+          <div id="page-lowongan" class="page-content hidden">
+            <div class="flex items-center justify-between mb-6">
+              <div class="flex gap-3 flex-wrap">
+                <div class="relative">
+                  <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                  <input type="text" id="filterLowonganSearch" placeholder="Cari lowongan..." oninput="applyLowonganFilter()" class="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                </div>
+                <select id="filterLowonganStatus" onchange="applyLowonganFilter()" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option value="">Semua Status</option>
+                  <option>Aktif</option>
+                  <option>On Hold</option>
+                  <option>Closed</option>
+                </select>
+                <select id="filterLowonganDept" onchange="applyLowonganFilter()" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option value="">Semua Departemen</option>
+                  <option>Sales</option>
+                  <option>Brand Marketing</option>
+                  <option>Finance</option>
+                  <option>Accounting Tax</option>
+                  <option>HCGA</option>
+                  <option>SCM</option>
+                </select>
+                <select id="filterLowonganPengaju" onchange="applyLowonganFilter()" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option value="">Semua Pengaju</option>
+                </select>
+              </div>
+              <button onclick="openTambahLowongan()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-sm shadow-indigo-200 transition">
+                <i class="fas fa-plus"></i> Tambah Lowongan
+              </button>
+            </div>
+            <div id="lowonganList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+          </div>
+
+          <!-- KANDIDAT -->
+          <div id="page-kandidat" class="page-content hidden">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <div class="flex gap-3 flex-wrap">
+                <div class="relative">
+                  <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                  <input type="text" id="filterKandidatSearch" placeholder="Cari kandidat..." oninput="applyKandidatFilter()" class="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm w-64 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <select id="filterKandidatPosisi" onchange="applyKandidatFilter()" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white">
+                  <option value="">Semua Posisi</option>
+                </select>
+                <select id="filterKandidatTahap" onchange="applyKandidatFilter()" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white">
+                  <option value="">Semua Tahap</option>
+                  <option>ER</option>
+                  <option>Screening</option>
+                  <option>Pengisian identitas Kandidat</option>
+                  <option>Psikotes</option>
+                  <option>Interview HR</option>
+                  <option>Interview User</option>
+                  <option>Background Check</option>
+                  <option>Offering</option>
+                  <option>On Hold</option>
+                  <option>Hired</option>
+                  <option>Rejected</option>
+                </select>
+              </div>
+              <button onclick="openTambahKandidat()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-sm shadow-indigo-200 transition">
+                <i class="fas fa-plus"></i> Tambah Kandidat
+              </button>
+            </div>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50/80 text-gray-400">
+                  <tr>
+                    <th class="text-left px-6 py-3.5 font-medium">Kandidat</th>
+                    <th class="text-left px-6 py-3.5 font-medium">Posisi</th>
+                    <th class="text-left px-6 py-3.5 font-medium">Sumber</th>
+                    <th class="text-left px-6 py-3.5 font-medium">Tahap</th>
+                    <th class="text-left px-6 py-3.5 font-medium">Recruiter</th>
+                    <th class="text-left px-6 py-3.5 font-medium">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50" id="kandidatTableBody">
+                  <!-- diisi JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- PIPELINE -->
+          <div id="page-pipeline" class="page-content hidden">
+            <div class="mb-5 flex items-center justify-between flex-wrap gap-3">
+              <select id="pipelinePosisiFilter" onchange="renderPipeline()" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="">Semua Posisi</option>
+              </select>
+              <p class="text-sm text-gray-400 admin-only">Gunakan dropdown di kartu untuk memindahkan tahap</p>
+            </div>
+            <div id="pipelineBoard" class="flex gap-4 overflow-x-auto pb-4" style="min-height: 320px;">
+              <!-- diisi JS -->
+            </div>
+          </div>
+
+          <!-- INTERVIEW -->
+          <div id="page-interview" class="page-content hidden">
+            <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+              <div class="flex gap-2">
+                <button id="btnInterviewMinggu" onclick="setInterviewFilter('minggu')" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm shadow-indigo-200">Minggu Ini</button>
+                <button id="btnInterviewBulan" onclick="setInterviewFilter('bulan')" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50 bg-white">Bulan Ini</button>
+                <button id="btnInterviewSemua" onclick="setInterviewFilter('semua')" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50 bg-white">Semua</button>
+              </div>
+              <button onclick="openTambahInterview()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-sm shadow-indigo-200 transition">
+                <i class="fas fa-plus"></i> Jadwalkan Interview
+              </button>
+            </div>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50/80 text-gray-400">
+                  <tr>
+                    <th class="text-left px-6 py-3.5 font-medium">Tanggal & Waktu</th>
+                    <th class="text-left px-6 py-3.5 font-medium">Kandidat</th>
+                    <th class="text-left px-6 py-3.5 font-medium">Posisi</th>
+                    <th class="text-left px-6 py-3.5 font-medium">Tipe</th>
+                    <th class="text-left px-6 py-3.5 font-medium">Interviewer</th>
+                    <th class="text-left px-6 py-3.5 font-medium">Status</th>
+                    <th class="text-left px-6 py-3.5 font-medium">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50" id="interviewTableBody">
+                  <!-- diisi JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tambah Lowongan -->
+  <div id="modalTambahLowongan" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="font-semibold text-gray-900 text-lg">Tambah Lowongan Kerja</h3>
+        <button onclick="closeTambahLowongan()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+      </div>
+      <form onsubmit="submitTambahLowongan(event)" class="p-6 space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Judul Posisi *</label>
+          <input type="text" id="newJobTitle" required placeholder="Contoh: Frontend Developer" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Departemen *</label>
+          <select id="newJobDept" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Pilih</option>
+            <option>Sales</option>
+            <option>Brand Marketing</option>
+            <option>Finance</option>
+            <option>Accounting Tax</option>
+            <option>HCGA</option>
+            <option>SCM</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Jumlah Kebutuhan *</label>
+            <input type="number" id="newJobQty" required min="1" value="1" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Tipe Pekerjaan</label>
+            <select id="newJobType" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option>Full-time</option>
+              <option>Part-time</option>
+              <option>Kontrak</option>
+              <option>Internship</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Diajukan oleh</label>
+          <input type="text" id="newJobPengaju" placeholder="Nama pengaju" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-medium transition">Simpan Lowongan</button>
+          <button type="button" onclick="closeTambahLowongan()" class="px-5 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Update Progress -->
+  <div id="modalUpdateProgress" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
+        <h3 class="font-semibold text-gray-900 text-lg">Update Progress</h3>
+        <button onclick="closeUpdateProgress()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+      </div>
+      <form onsubmit="submitUpdateProgress(event)" class="p-6 space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Posisi</label>
+          <input type="text" id="updTitle" disabled class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-gray-500">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Status *</label>
+            <select id="updStatus" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option>Aktif</option>
+              <option>On Hold</option>
+              <option>Closed</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Progress (%) *</label>
+            <input type="number" id="updPercent" required min="0" max="100" value="0" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah Kandidat per Tahap</label>
+          <div class="grid grid-cols-5 gap-2">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1 text-center">Applied</label>
+              <input type="number" id="updApplied" min="0" value="0" class="w-full border border-gray-200 rounded-xl px-2 py-2 text-sm text-center">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1 text-center">Screening</label>
+              <input type="number" id="updScreening" min="0" value="0" class="w-full border border-gray-200 rounded-xl px-2 py-2 text-sm text-center">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1 text-center">Interview</label>
+              <input type="number" id="updInterview" min="0" value="0" class="w-full border border-gray-200 rounded-xl px-2 py-2 text-sm text-center">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1 text-center">Offer</label>
+              <input type="number" id="updOffer" min="0" value="0" class="w-full border border-gray-200 rounded-xl px-2 py-2 text-sm text-center">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1 text-center">Hired</label>
+              <input type="number" id="updHired" min="0" value="0" class="w-full border border-gray-200 rounded-xl px-2 py-2 text-sm text-center">
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Catatan Progress *</label>
+          <textarea id="updNote" rows="3" required placeholder="Tuliskan update progress..." class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-medium transition">Simpan Update</button>
+          <button type="button" onclick="closeUpdateProgress()" class="px-5 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Riwayat -->
+  <div id="modalHistory" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[80vh] flex flex-col">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="font-semibold text-gray-900 text-lg" id="historyTitle">Riwayat Update</h3>
+        <button onclick="closeHistory()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="historyBody" class="p-6 overflow-y-auto space-y-4"></div>
+    </div>
+  </div>
+
+  <!-- Modal Tambah Interview (BARU) -->
+  <div id="modalTambahInterview" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
+        <h3 class="font-semibold text-gray-900 text-lg">Jadwalkan Interview</h3>
+        <button onclick="closeTambahInterview()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+      </div>
+      <form onsubmit="submitTambahInterview(event)" class="p-6 space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Kandidat *</label>
+          <select id="newIntKandidat" required onchange="onKandidatSelect()" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Pilih kandidat</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Posisi *</label>
+          <input type="text" id="newIntPosisi" required readonly class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-gray-600">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal *</label>
+            <input type="date" id="newIntTanggal" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Waktu *</label>
+            <input type="time" id="newIntWaktu" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Durasi (menit)</label>
+          <input type="number" id="newIntDurasi" value="60" min="15" step="15" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Tipe Interview *</label>
+          <select id="newIntTipe" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Pilih tipe</option>
+            <option>Technical</option>
+            <option>Portfolio</option>
+            <option>User</option>
+            <option>Final</option>
+            <option>HR</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Interviewer *</label>
+          <input type="text" id="newIntInterviewer" required placeholder="Nama interviewer" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Status *</label>
+          <select id="newIntStatus" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option>Pending</option>
+            <option>Confirmed</option>
+          </select>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-medium transition">Simpan Jadwal</button>
+          <button type="button" onclick="closeTambahInterview()" class="px-5 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Edit Interview -->
+  <div id="modalEditInterview" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
+        <h3 class="font-semibold text-gray-900 text-lg">Edit Jadwal Interview</h3>
+        <button onclick="closeEditInterview()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+      </div>
+      <form onsubmit="submitEditInterview(event)" class="p-6 space-y-5">
+        <input type="hidden" id="editIntId">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Kandidat</label>
+          <input type="text" id="editIntKandidat" disabled class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-gray-600">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Posisi</label>
+          <input type="text" id="editIntPosisi" disabled class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-gray-600">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal *</label>
+            <input type="date" id="editIntTanggal" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Waktu *</label>
+            <input type="time" id="editIntWaktu" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Durasi (menit)</label>
+          <input type="number" id="editIntDurasi" value="60" min="15" step="15" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Tipe Interview</label>
+          <select id="editIntTipe" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option>Technical</option>
+            <option>Portfolio</option>
+            <option>User</option>
+            <option>Final</option>
+            <option>HR</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Interviewer</label>
+          <input type="text" id="editIntInterviewer" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Status *</label>
+          <select id="editIntStatus" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option>Pending</option>
+            <option>Confirmed</option>
+          </select>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-medium transition">Simpan Perubahan</button>
+          <button type="button" onclick="closeEditInterview()" class="px-5 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Tambah Kandidat (BARU) -->
+  <div id="modalTambahKandidat" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="font-semibold text-gray-900 text-lg">Tambah Kandidat</h3>
+        <button onclick="closeTambahKandidat()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+      </div>
+      <form onsubmit="submitTambahKandidat(event)" class="p-6 space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap *</label>
+          <input type="text" id="newKanNama" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email *</label>
+          <input type="email" id="newKanEmail" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Posisi *</label>
+          <select id="newKanPosisi" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Pilih posisi</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Sumber</label>
+            <select id="newKanSumber" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option>LinkedIn</option>
+              <option>Job Portal</option>
+              <option>Referral</option>
+              <option>Website</option>
+              <option>Lainnya</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pengalaman (tahun)</label>
+            <input type="number" id="newKanExp" min="0" value="1" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Recruiter</label>
+          <select id="newKanRecruiter" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <option value="Febrinita">Febrinita</option>
+            <option value="Rifki">Rifki</option>
+          </select>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-medium transition">Simpan Kandidat</button>
+          <button type="button" onclick="closeTambahKandidat()" class="px-5 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Notifikasi -->
+  <div id="modalNotif" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="font-semibold text-gray-900 text-lg">Notifikasi</h3>
+        <button onclick="closeNotif()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="notifBody" class="p-4 space-y-3 max-h-80 overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <!-- Modal Jadwalkan Interview (dari Pipeline) -->
+  <div id="modalScheduleFromPipeline" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div>
+          <h3 class="font-semibold text-gray-900 text-lg">Jadwalkan Interview</h3>
+          <p class="text-xs text-gray-400 mt-0.5" id="schedPipeSubtitle">Isi tanggal & waktu interview</p>
+        </div>
+        <button onclick="closeScheduleFromPipeline(true)" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+      </div>
+      <form onsubmit="submitScheduleFromPipeline(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Kandidat</label>
+          <input type="text" id="schedPipeKandidat" disabled class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-gray-600">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Posisi / Tahap</label>
+          <input type="text" id="schedPipePosisi" disabled class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-gray-600">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal *</label>
+            <input type="date" id="schedPipeTanggal" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Waktu *</label>
+            <input type="time" id="schedPipeWaktu" required value="10:00" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Durasi (menit)</label>
+          <input type="number" id="schedPipeDurasi" value="60" min="15" step="15" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Interviewer</label>
+          <input type="text" id="schedPipeInterviewer" placeholder="Nama interviewer" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-medium transition">Simpan Jadwal</button>
+          <button type="button" onclick="closeScheduleFromPipeline(true)" class="px-5 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50">Lewati</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal List Hired / Rejected -->
+  <div id="modalStageList" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
+        <div>
+          <h3 class="font-semibold text-gray-900 text-lg" id="stageListTitle">Daftar Kandidat</h3>
+          <p class="text-xs text-gray-400 mt-0.5" id="stageListSubtitle"></p>
+        </div>
+        <button onclick="closeStageList()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="px-6 py-3 border-b border-gray-50 shrink-0">
+        <div class="relative">
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+          <input type="text" id="stageListSearch" placeholder="Cari nama / posisi..." oninput="filterStageList()" class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+      </div>
+      <div id="stageListBody" class="p-4 overflow-y-auto flex-1 space-y-2"></div>
+    </div>
+  </div>
+
+  <script>
+    // ========== DATA (kosong — diisi dari Google Sheet via API) ==========
+    let lowonganData = [];
+    let kandidatData = [];
+    let interviewData = [];
+
+    let currentUpdateIndex = null;
+    let currentUser = { name: '', role: 'pengaju' }; // pengaju | admin
+    let interviewFilter = 'minggu';
+
+    const STAGE_COLORS = {
+      'ER': { bg: 'bg-slate-50', header: 'text-slate-700', badge: 'bg-slate-200 text-slate-600' },
+      'Screening': { bg: 'bg-amber-50', header: 'text-amber-800', badge: 'bg-amber-200 text-amber-700' },
+      'Pengisian identitas Kandidat': { bg: 'bg-cyan-50', header: 'text-cyan-800', badge: 'bg-cyan-200 text-cyan-700' },
+      'Psikotes': { bg: 'bg-orange-50', header: 'text-orange-800', badge: 'bg-orange-200 text-orange-700' },
+      'Interview HR': { bg: 'bg-blue-50', header: 'text-blue-800', badge: 'bg-blue-200 text-blue-700' },
+      'Interview User': { bg: 'bg-indigo-50', header: 'text-indigo-800', badge: 'bg-indigo-200 text-indigo-700' },
+      'Background Check': { bg: 'bg-violet-50', header: 'text-violet-800', badge: 'bg-violet-200 text-violet-700' },
+      'Offering': { bg: 'bg-purple-50', header: 'text-purple-800', badge: 'bg-purple-200 text-purple-700' },
+      'On Hold': { bg: 'bg-yellow-50', header: 'text-yellow-800', badge: 'bg-yellow-200 text-yellow-700' },
+      'Hired': { bg: 'bg-emerald-50', header: 'text-emerald-800', badge: 'bg-emerald-200 text-emerald-700' },
+      'Rejected': { bg: 'bg-red-50', header: 'text-red-800', badge: 'bg-red-200 text-red-700' }
+    };
+    const STAGES = ['ER', 'Screening', 'Pengisian identitas Kandidat', 'Psikotes', 'Interview HR', 'Interview User', 'Background Check', 'Offering', 'On Hold', 'Hired', 'Rejected'];
+    const COLOR_MAP = { indigo: 'bg-indigo-100 text-indigo-600', pink: 'bg-pink-100 text-pink-600', emerald: 'bg-emerald-100 text-emerald-600', orange: 'bg-orange-100 text-orange-600', sky: 'bg-sky-100 text-sky-600', violet: 'bg-violet-100 text-violet-600', red: 'bg-red-100 text-red-600', amber: 'bg-amber-100 text-amber-600' };
+
+    // ========== GOOGLE APPS SCRIPT API ==========
+    // GANTI URL di bawah dengan URL Web App Anda (yang berakhiran /exec)
+    const API_URL = 'https://script.google.com/macros/s/AKfycbz9eDklmIYBCm6PCHZvNEYHDTiot5YVkfnBoUf7QqVujm_z2_oE9FZxelnlUr7sJ-1c7Q/exec';
+
+    async function apiRequest(payload) {
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        return await res.json();
+      } catch (err) {
+        console.warn('API error:', err);
+        return { error: String(err) };
+      }
+    }
+
+    async function loadAllData() {
+      try {
+        const data = await apiRequest({ action: 'getAllSheets' });
+        if (!data || data.error) {
+          console.warn('Gagal load Sheets:', data && data.error);
+          lowonganData = [];
+          kandidatData = [];
+          interviewData = [];
+          return;
+        }
+        // Sumber kebenaran = spreadsheet (boleh kosong)
+        lowonganData = Array.isArray(data.lowongan)
+          ? data.lowongan.map(row => ({
+              id: Number(row.id) || 0,
+              title: row.title || '',
+              dept: row.dept || '',
+              loc: row.loc || '',
+              qty: Number(row.qty) || 1,
+              status: row.status || 'Aktif',
+              percent: Number(row.percent) || 0,
+              pengaju: row.pengaju || '',
+              kandidat: Number(row.kandidat) || 0,
+              hari: Number(row.hari) || 0,
+              note: row.note || '',
+              lastUpdate: row.lastUpdate || '',
+              counts: { applied: 0, screening: 0, interview: 0, offer: 0, hired: 0 },
+              history: []
+            }))
+          : [];
+        kandidatData = Array.isArray(data.kandidat)
+          ? data.kandidat.map(row => ({
+              id: Number(row.id) || 0,
+              nama: row.nama || '',
+              email: row.email || '',
+              posisi: row.posisi || '',
+              sumber: row.sumber || '',
+              tahap: row.tahap || 'ER',
+              recruiter: row.recruiter || '',
+              exp: Number(row.exp) || 0,
+              tanggal: row.tanggal || '',
+              initials: row.initials || (row.nama ? row.nama.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase() : '??'),
+              color: row.color || 'indigo'
+            }))
+          : [];
+        interviewData = Array.isArray(data.interview)
+          ? data.interview.map(row => {
+              let tanggal = normalizeDate(row.tanggal);
+              let waktu = normalizeTime(row.waktu);
+              // Jika tanggal kosong tapi waktu berisi ISO/datetime, coba pisahkan
+              if (!tanggal && row.tanggal) {
+                const raw = String(row.tanggal);
+                if (/^\d{4}-\d{2}-\d{2}T/.test(raw) && !raw.startsWith('1899')) {
+                  tanggal = raw.slice(0, 10);
+                  if (!waktu) waktu = normalizeTime(raw);
+                }
+              }
+              // Jika waktu dari Sheets jadi 1899 date, normalizeTime sudah ambil jamnya
+              if (!waktu && row.waktu) waktu = normalizeTime(row.waktu);
+              return {
+                id: Number(row.id) || 0,
+                kandidatId: Number(row.kandidatId) || 0,
+                kandidat: row.kandidat || '',
+                posisi: row.posisi || '',
+                tanggal: tanggal,
+                waktu: waktu,
+                durasi: Number(row.durasi) || 60,
+                tipe: row.tipe || '',
+                interviewer: row.interviewer || '',
+                status: row.status || 'Pending'
+              };
+            })
+          : [];
+      } catch (err) {
+        console.warn('Gagal load dari Sheets:', err);
+        lowonganData = [];
+        kandidatData = [];
+        interviewData = [];
+      }
+    }
+
+    async function apiCreate(sheet, data) {
+      return apiRequest({ action: 'create', sheet, data });
+    }
+
+    async function apiUpdate(sheet, id, data) {
+      return apiRequest({ action: 'update', sheet, id, data });
+    }
+
+    async function apiDelete(sheet, id) {
+      return apiRequest({ action: 'delete', sheet, id });
+    }
+
+    // Normalisasi tanggal/waktu dari Google Sheets (hindari 1899-12-30, dll.)
+    function normalizeDate(val) {
+      if (val === null || val === undefined || val === '') return '';
+      const s = String(val).trim();
+      // Sudah format yyyy-MM-dd
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+        if (s.startsWith('1899')) return ''; // epoch palsu dari time cell
+        return s;
+      }
+      // ISO datetime: 2026-08-07T10:00:00.000Z
+      if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+        if (s.startsWith('1899')) return '';
+        return s.slice(0, 10);
+      }
+      // dd/MM/yyyy atau dd-MM-yyyy
+      const m1 = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+      if (m1) {
+        const dd = m1[1].padStart(2, '0');
+        const mm = m1[2].padStart(2, '0');
+        return `${m1[3]}-${mm}-${dd}`;
+      }
+      const d = new Date(s);
+      if (!isNaN(d.getTime())) {
+        const y = d.getFullYear();
+        if (y < 1970) return ''; // epoch palsu
+        return d.toISOString().slice(0, 10);
+      }
+      return s;
+    }
+
+    function normalizeTime(val) {
+      if (val === null || val === undefined || val === '') return '';
+      const s = String(val).trim();
+      // HH:mm atau HH:mm:ss
+      const m = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
+      if (m) {
+        return `${m[1].padStart(2, '0')}:${m[2]}`;
+      }
+      // ISO datetime — ambil jam
+      if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) {
+          // Jika tanggal 1899, tetap ambil jamnya (ini sering time-only dari Sheets)
+          return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+      }
+      // Sheets kadang kirim time sebagai Date string berisi 1899
+      if (s.includes('1899') || s.toLowerCase().includes('dec')) {
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) {
+          return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+      }
+      const d = new Date(s);
+      if (!isNaN(d.getTime()) && d.getFullYear() >= 1970) {
+        return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      }
+      return s;
+    }
+
+    function formatInterviewDateDisplay(tanggal) {
+      const t = normalizeDate(tanggal);
+      if (!t) return '—';
+      const d = new Date(t + 'T00:00:00');
+      if (isNaN(d.getTime())) return t;
+      const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+      return `${dayNames[d.getDay()]}, ${d.getDate()} ${d.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}`;
+    }
+
+    // ========== FUNGSI ASLI (dipertahankan & diperluas) ==========
+    function renderLowongan(filtered = null) {
+      const container = document.getElementById('lowonganList');
+      let data = filtered !== null ? filtered : getVisibleLowongan();
+      if (data.length === 0) {
+        container.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">Tidak ada lowongan yang cocok.</p>';
+        return;
+      }
+      container.innerHTML = data.map((job) => {
+        const index = lowonganData.indexOf(job);
+        const statusClass = job.status === 'Aktif'
+          ? 'bg-emerald-50 text-emerald-600' 
+          : job.status === 'On Hold'
+            ? 'bg-amber-50 text-amber-600' 
+            : 'bg-gray-100 text-gray-600';
+        const needsAttention = isLowonganNeedsAttention(job);
+        return `
+        <div class="bg-white rounded-2xl border ${needsAttention ? 'border-amber-300' : 'border-gray-100'} shadow-sm p-5 hover:shadow-md transition relative">
+          ${needsAttention ? '<span class="absolute top-3 right-3 w-2.5 h-2.5 bg-amber-400 rounded-full" title="Sudah lama tidak diupdate"></span>' : ''}
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <h3 class="font-semibold text-gray-900">${job.title}</h3>
+              <p class="text-sm text-gray-400 mt-0.5">${job.dept}${job.loc ? ' • ' + job.loc : ''}</p>
+            </div>
+            <span class="px-2.5 py-1 ${statusClass} text-xs rounded-full font-medium">${job.status || 'Aktif'}</span>
+          </div>
+          <div class="mb-3">
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-gray-500">Progress</span>
+              <span class="font-medium text-indigo-600">${job.percent || 0}%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2">
+              <div class="bg-indigo-500 h-2 rounded-full transition-all" style="width: ${job.percent || 0}%"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
+            <span><i class="fas fa-users mr-1.5 text-gray-300"></i>${job.kandidat || 0} kandidat</span>
+            <span><i class="fas fa-user-plus mr-1.5 text-gray-300"></i>Butuh ${job.qty} orang</span>
+            <span><i class="fas fa-clock mr-1.5 text-gray-300"></i>${job.hari || 0} hari</span>
+          </div>
+          ${job.note ? `<div class="bg-gray-50 rounded-lg p-2.5 mb-3"><p class="text-xs text-gray-500 line-clamp-2">"${job.note}"</p></div>` : ''}
+          <div class="flex items-center justify-between pt-3 border-t border-gray-50">
+            <div class="text-xs text-gray-400">Diajukan: <span class="text-gray-600">${job.pengaju}</span></div>
+            <div class="flex gap-3">
+              <button onclick="openHistory(${index})" class="text-gray-500 text-sm font-medium hover:text-indigo-600">
+                <i class="fas fa-history mr-1"></i>Riwayat
+              </button>
+              <button onclick="openUpdateProgress(${index})" class="admin-only text-indigo-600 text-sm font-medium hover:underline">
+                <i class="fas fa-edit mr-1"></i>Update
+              </button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function getVisibleLowongan() {
+      // Kedua role melihat data yang sama (semua lowongan)
+      return lowonganData;
+    }
+
+    function isLowonganNeedsAttention(job) {
+      if (!job.lastUpdate) return false;
+      const last = new Date(job.lastUpdate);
+      const now = new Date();
+      const diffDays = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+      return diffDays >= 7 && !['Closed'].includes(job.status);
+    }
+
+    function openTambahLowongan() {
+      document.getElementById('modalTambahLowongan').classList.remove('hidden');
+      document.getElementById('modalTambahLowongan').classList.add('flex');
+    }
+    function closeTambahLowongan() {
+      document.getElementById('modalTambahLowongan').classList.add('hidden');
+      document.getElementById('modalTambahLowongan').classList.remove('flex');
+    }
+    function submitTambahLowongan(e) {
+      e.preventDefault();
+      const newJob = {
+        title: document.getElementById('newJobTitle').value,
+        dept: document.getElementById('newJobDept').value,
+        loc: '',
+        qty: parseInt(document.getElementById('newJobQty').value) || 1,
+        status: 'Aktif', percent: 0, pengaju: document.getElementById('newJobPengaju').value || 'Admin',
+        kandidat: 0, hari: 0, counts: { applied: 0, screening: 0, interview: 0, offer: 0, hired: 0 },
+        note: '', lastUpdate: new Date().toISOString().slice(0, 10), history: []
+      };
+      lowonganData.unshift(newJob);
+      apiCreate('lowongan', {
+        title: newJob.title, dept: newJob.dept, qty: newJob.qty, status: newJob.status,
+        percent: newJob.percent, pengaju: newJob.pengaju, kandidat: newJob.kandidat,
+        hari: newJob.hari, note: newJob.note, lastUpdate: newJob.lastUpdate
+      }).catch(console.warn);
+      renderLowongan();
+      populateFilters();
+      updateBadges();
+      closeTambahLowongan();
+      document.getElementById('newJobTitle').value = '';
+      document.getElementById('newJobDept').value = '';
+      document.getElementById('newJobQty').value = '1';
+      document.getElementById('newJobPengaju').value = '';
+    }
+
+    function openUpdateProgress(index) {
+      currentUpdateIndex = index;
+      const job = lowonganData[index];
+      document.getElementById('updTitle').value = job.title;
+      document.getElementById('updStatus').value = job.status || 'Aktif';
+      document.getElementById('updPercent').value = job.percent || 0;
+      document.getElementById('updApplied').value = job.counts?.applied || 0;
+      document.getElementById('updScreening').value = job.counts?.screening || 0;
+      document.getElementById('updInterview').value = job.counts?.interview || 0;
+      document.getElementById('updOffer').value = job.counts?.offer || 0;
+      document.getElementById('updHired').value = job.counts?.hired || 0;
+      document.getElementById('updNote').value = '';
+      document.getElementById('modalUpdateProgress').classList.remove('hidden');
+      document.getElementById('modalUpdateProgress').classList.add('flex');
+    }
+    function closeUpdateProgress() {
+      document.getElementById('modalUpdateProgress').classList.add('hidden');
+      document.getElementById('modalUpdateProgress').classList.remove('flex');
+      currentUpdateIndex = null;
+    }
+    function submitUpdateProgress(e) {
+      e.preventDefault();
+      if (currentUpdateIndex === null) return;
+      const job = lowonganData[currentUpdateIndex];
+      const prevStatus = job.status;
+      const status = document.getElementById('updStatus').value;
+      const percent = parseInt(document.getElementById('updPercent').value) || 0;
+      const counts = {
+        applied: parseInt(document.getElementById('updApplied').value) || 0,
+        screening: parseInt(document.getElementById('updScreening').value) || 0,
+        interview: parseInt(document.getElementById('updInterview').value) || 0,
+        offer: parseInt(document.getElementById('updOffer').value) || 0,
+        hired: parseInt(document.getElementById('updHired').value) || 0
+      };
+      const note = document.getElementById('updNote').value;
+      const now = new Date().toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      job.status = status;
+      job.percent = percent;
+      job.counts = counts;
+      job.note = note;
+      job.kandidat = counts.applied + counts.screening + counts.interview + counts.offer + counts.hired;
+      job.lastUpdate = new Date().toISOString().slice(0, 10);
+      if (!job.history) job.history = [];
+      job.history.unshift({ date: now, by: currentUser.name || 'Admin', status, percent, note, counts: { ...counts }, prevStatus });
+
+      if (job.id) {
+        apiUpdate('lowongan', job.id, {
+          status: job.status, percent: job.percent, note: job.note,
+          kandidat: job.kandidat, lastUpdate: job.lastUpdate
+        }).catch(console.warn);
+      }
+
+      renderLowongan();
+      updateBadges();
+      closeUpdateProgress();
+    }
+
+    function openHistory(index) {
+      const job = lowonganData[index];
+      document.getElementById('historyTitle').textContent = 'Riwayat: ' + job.title;
+      const history = job.history || [];
+      document.getElementById('historyBody').innerHTML = history.length 
+        ? history.map(h => `
+          <div class="border border-gray-100 rounded-xl p-4">
+            <div class="flex justify-between items-start mb-2">
+              <div class="flex items-center gap-2">
+                ${h.prevStatus ? `<span class="text-xs text-gray-400 line-through">${h.prevStatus}</span><i class="fas fa-arrow-right text-gray-300 text-xs"></i>` : ''}
+                <span class="text-sm font-medium text-gray-900">${h.status}</span>
+              </div>
+              <span class="text-xs text-gray-400">${h.date}</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-2">"${h.note}"</p>
+            <div class="flex gap-3 text-xs text-gray-500">
+              <span>Progress: ${h.percent}%</span>
+              <span>A:${h.counts.applied} S:${h.counts.screening} I:${h.counts.interview} O:${h.counts.offer} H:${h.counts.hired}</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-1.5">oleh ${h.by}</p>
+          </div>`).join('')
+        : '<p class="text-center text-gray-400 py-8">Belum ada riwayat update.</p>';
+      document.getElementById('modalHistory').classList.remove('hidden');
+      document.getElementById('modalHistory').classList.add('flex');
+    }
+    function closeHistory() {
+      document.getElementById('modalHistory').classList.add('hidden');
+      document.getElementById('modalHistory').classList.remove('flex');
+    }
+
+    function showAdminLogin() {
+      document.getElementById('landingPage').classList.remove('active');
+      document.getElementById('adminLoginPage').classList.add('active');
+    }
+    function backToLanding() {
+      document.getElementById('adminLoginPage').classList.remove('active');
+      document.getElementById('landingPage').classList.add('active');
+    }
+    function enterAsPengaju() {
+      document.body.classList.add('role-pengaju');
+      document.body.classList.remove('role-admin');
+      currentUser = { name: 'Haloo!', role: 'pengaju' };
+      document.getElementById('userName').textContent = 'Haloo!';
+      document.getElementById('userRole').textContent = 'Pengaju (Viewer)';
+      document.getElementById('roleBadge').textContent = 'Pengaju';
+      document.getElementById('roleBadge').className = 'px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700';
+      enterApp();
+    }
+    function loginAdmin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+      if (email === 'TA@lahanniaga.com' && pass === 'TA123') {
+        document.body.classList.remove('role-pengaju');
+        document.body.classList.add('role-admin');
+        currentUser = { name: 'Tim Rekrutmen', role: 'admin' };
+        document.getElementById('userName').textContent = 'Tim Rekrutmen';
+        document.getElementById('userRole').textContent = 'Tim Rekrutmen';
+        document.getElementById('roleBadge').textContent = 'Admin';
+        document.getElementById('roleBadge').className = 'px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700';
+        enterApp();
+      } else {
+        alert('Email atau password salah.');
+      }
+    }
+
+    function toggleLoginPassword() {
+      const input = document.getElementById('loginPassword');
+      const eye = document.getElementById('loginPasswordEye');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eye.classList.remove('fa-eye');
+        eye.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        eye.classList.remove('fa-eye-slash');
+        eye.classList.add('fa-eye');
+      }
+    }
+    async function enterApp() {
+      document.getElementById('landingPage').classList.remove('active');
+      document.getElementById('adminLoginPage').classList.remove('active');
+      document.getElementById('appPage').classList.add('active');
+      await loadAllData();
+      populateFilters();
+      renderLowongan();
+      renderKandidat();
+      renderPipeline();
+      renderInterview();
+      renderDashboard();
+      updateBadges();
+      showPage('dashboard');
+    }
+    function logout() {
+      document.getElementById('appPage').classList.remove('active');
+      document.getElementById('landingPage').classList.add('active');
+      document.body.classList.add('role-pengaju');
+      document.body.classList.remove('role-admin');
+      currentUser = { name: '', role: 'pengaju' };
+    }
+
+    const pageTitles = {
+      dashboard: ['Dashboard', 'Ringkasan rekrutmen hari ini'],
+      lowongan: ['Lowongan', 'Kelola semua posisi yang dibuka'],
+      kandidat: ['Kandidat', 'Daftar semua kandidat dalam proses'],
+      pipeline: ['Pipeline', 'Visualisasi tahapan kandidat'],
+      interview: ['Jadwal Interview', 'Kelola jadwal wawancara kandidat']
+    };
+    function showPage(pageId) {
+      document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('page-' + pageId).classList.remove('hidden');
+      document.getElementById('pageTitle').textContent = pageTitles[pageId][0];
+      document.getElementById('pageSubtitle').textContent = pageTitles[pageId][1];
+      document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+      if (event && event.currentTarget) event.currentTarget.classList.add('active');
+      // re-render on page show
+      if (pageId === 'lowongan') renderLowongan();
+      if (pageId === 'kandidat') renderKandidat();
+      if (pageId === 'pipeline') renderPipeline();
+      if (pageId === 'interview') renderInterview();
+      if (pageId === 'dashboard') renderDashboard();
+    }
+
+    // ========== FITUR BARU: Filter Lowongan ==========
+    function applyLowonganFilter() {
+      const search = (document.getElementById('filterLowonganSearch')?.value || '').toLowerCase();
+      const status = document.getElementById('filterLowonganStatus')?.value || '';
+      const dept = document.getElementById('filterLowonganDept')?.value || '';
+      const pengaju = document.getElementById('filterLowonganPengaju')?.value || '';
+      let data = getVisibleLowongan();
+      if (search) data = data.filter(j => j.title.toLowerCase().includes(search) || j.dept.toLowerCase().includes(search));
+      if (status) data = data.filter(j => j.status === status);
+      if (dept) data = data.filter(j => j.dept === dept);
+      if (pengaju) data = data.filter(j => j.pengaju === pengaju);
+      renderLowongan(data);
+    }
+
+    // ========== FITUR BARU: Kandidat ==========
+    function renderKandidat(filtered = null) {
+      const tbody = document.getElementById('kandidatTableBody');
+      const data = filtered !== null ? filtered : kandidatData;
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-400 py-10">Tidak ada kandidat.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(k => {
+        const tahapClass = {
+          'ER': 'bg-slate-100 text-slate-600',
+          'Screening': 'bg-amber-50 text-amber-600',
+          'Pengisian identitas Kandidat': 'bg-cyan-50 text-cyan-600',
+          'Psikotes': 'bg-orange-50 text-orange-600',
+          'Interview HR': 'bg-blue-50 text-blue-600',
+          'Interview User': 'bg-indigo-50 text-indigo-600',
+          'Background Check': 'bg-violet-50 text-violet-600',
+          'Offering': 'bg-purple-50 text-purple-600',
+          'On Hold': 'bg-yellow-50 text-yellow-600',
+          'Hired': 'bg-emerald-50 text-emerald-600',
+          'Rejected': 'bg-red-50 text-red-600'
+        }[k.tahap] || 'bg-gray-100 text-gray-600';
+        return `
+        <tr class="hover:bg-gray-50/50">
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full ${COLOR_MAP[k.color] || 'bg-gray-100 text-gray-600'} flex items-center justify-center font-semibold text-xs">${k.initials}</div>
+              <div>
+                <p class="font-medium text-gray-900">${k.nama}</p>
+                <p class="text-xs text-gray-400">${k.email}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4 text-gray-600">${k.posisi}</td>
+          <td class="px-6 py-4"><span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-lg">${k.sumber}</span></td>
+          <td class="px-6 py-4"><span class="px-2.5 py-1 ${tahapClass} rounded-full text-xs font-medium">${k.tahap}</span></td>
+          <td class="px-6 py-4 text-gray-400">${k.recruiter}</td>
+          <td class="px-6 py-4">
+            <button onclick="viewKandidat(${k.id})" class="text-indigo-600 hover:text-indigo-800 mr-2" title="Lihat"><i class="fas fa-eye"></i></button>
+            <button onclick="moveKandidatStage(${k.id})" class="admin-only text-gray-400 hover:text-gray-600" title="Pindah tahap"><i class="fas fa-exchange-alt"></i></button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function applyKandidatFilter() {
+      const search = (document.getElementById('filterKandidatSearch')?.value || '').toLowerCase();
+      const posisi = document.getElementById('filterKandidatPosisi')?.value || '';
+      const tahap = document.getElementById('filterKandidatTahap')?.value || '';
+      let data = [...kandidatData];
+      if (search) data = data.filter(k => k.nama.toLowerCase().includes(search) || k.email.toLowerCase().includes(search));
+      if (posisi) data = data.filter(k => k.posisi === posisi);
+      if (tahap) data = data.filter(k => k.tahap === tahap);
+      renderKandidat(data);
+    }
+
+    function viewKandidat(id) {
+      const k = kandidatData.find(c => c.id === id);
+      if (!k) return;
+      alert(`Kandidat: ${k.nama}\nPosisi: ${k.posisi}\nTahap: ${k.tahap}\nPengalaman: ${k.exp} tahun\nRecruiter: ${k.recruiter}`);
+    }
+
+    function openTambahKandidat() {
+      const sel = document.getElementById('newKanPosisi');
+      // Hanya lowongan status Aktif yang bisa dipilih
+      const aktifJobs = lowonganData.filter(j => j.status === 'Aktif');
+      if (aktifJobs.length === 0) {
+        sel.innerHTML = '<option value="">Tidak ada lowongan aktif</option>';
+      } else {
+        sel.innerHTML = '<option value="">Pilih posisi</option>' + aktifJobs.map(j => `<option value="${j.title}">${j.title}</option>`).join('');
+      }
+      document.getElementById('modalTambahKandidat').classList.remove('hidden');
+      document.getElementById('modalTambahKandidat').classList.add('flex');
+    }
+    function closeTambahKandidat() {
+      document.getElementById('modalTambahKandidat').classList.add('hidden');
+      document.getElementById('modalTambahKandidat').classList.remove('flex');
+    }
+    function submitTambahKandidat(e) {
+      e.preventDefault();
+      const posisi = document.getElementById('newKanPosisi').value;
+      if (!posisi) {
+        alert('Pilih posisi terlebih dahulu.');
+        return;
+      }
+      const job = lowonganData.find(j => j.title === posisi);
+      if (!job || job.status !== 'Aktif') {
+        alert('Posisi ini tidak aktif (On Hold / Closed).\nAktifkan dulu di menu Lowongan sebelum menambah kandidat.');
+        return;
+      }
+      const nama = document.getElementById('newKanNama').value;
+      const initials = nama.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      const colors = ['indigo', 'pink', 'emerald', 'orange', 'sky', 'violet', 'amber'];
+      const newId = Math.max(...kandidatData.map(k => k.id), 0) + 1;
+      const newKan = {
+        id: newId,
+        nama,
+        email: document.getElementById('newKanEmail').value,
+        posisi: posisi,
+        sumber: document.getElementById('newKanSumber').value,
+        tahap: 'ER',
+        recruiter: document.getElementById('newKanRecruiter').value || currentUser.name || 'Febrinita',
+        exp: parseInt(document.getElementById('newKanExp').value) || 0,
+        tanggal: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+        initials,
+        color: colors[newId % colors.length]
+      };
+      kandidatData.unshift(newKan);
+      apiCreate('kandidat', newKan).catch(console.warn);
+      syncLowonganCounts();
+      renderKandidat();
+      renderPipeline();
+      renderDashboard();
+      updateBadges();
+      closeTambahKandidat();
+      document.getElementById('newKanNama').value = '';
+      document.getElementById('newKanEmail').value = '';
+    }
+
+    // ========== FITUR BARU: Pipeline interaktif ==========
+    let currentStageList = []; // data untuk modal Hired/Rejected
+    let currentStageName = '';
+
+    function renderPipeline() {
+      const board = document.getElementById('pipelineBoard');
+      const posisiFilter = document.getElementById('pipelinePosisiFilter')?.value || '';
+      let data = [...kandidatData];
+      if (posisiFilter) data = data.filter(k => k.posisi === posisiFilter);
+
+      board.innerHTML = STAGES.map(stage => {
+        const items = data.filter(k => k.tahap === stage);
+        const sc = STAGE_COLORS[stage];
+        // Hired & Rejected: tampilkan ringkasan + klik buka popup
+        if (stage === 'Hired' || stage === 'Rejected') {
+          const icon = stage === 'Hired' ? 'fa-user-check' : 'fa-user-times';
+          return `
+          <div class="${sc.bg} rounded-2xl p-3 shrink-0 cursor-pointer hover:shadow-md transition" style="width: 200px; min-width: 200px;" onclick="openStageList('${stage}')">
+            <div class="flex items-center justify-between mb-3 px-1">
+              <h4 class="text-sm font-semibold ${sc.header} leading-tight">${stage}</h4>
+              <span class="${sc.badge} text-xs px-2 py-0.5 rounded-full font-medium shrink-0">${items.length}</span>
+            </div>
+            <div class="flex flex-col items-center justify-center py-6 text-center">
+              <div class="w-12 h-12 rounded-full ${stage === 'Hired' ? 'bg-emerald-100' : 'bg-red-100'} flex items-center justify-center mb-3">
+                <i class="fas ${icon} ${stage === 'Hired' ? 'text-emerald-600' : 'text-red-600'} text-lg"></i>
+              </div>
+              <p class="text-2xl font-bold ${sc.header}">${items.length}</p>
+              <p class="text-xs text-gray-500 mt-1">kandidat</p>
+              <p class="text-xs ${stage === 'Hired' ? 'text-emerald-600' : 'text-red-600'} mt-3 font-medium">
+                <i class="fas fa-external-link-alt mr-1"></i>Lihat daftar
+              </p>
+            </div>
+          </div>`;
+        }
+        // Tahap lain: tampilkan kartu kandidat seperti biasa
+        return `
+        <div class="${sc.bg} rounded-2xl p-3 shrink-0" style="width: 200px; min-width: 200px;">
+          <div class="flex items-center justify-between mb-3 px-1">
+            <h4 class="text-sm font-semibold ${sc.header} leading-tight">${stage}</h4>
+            <span class="${sc.badge} text-xs px-2 py-0.5 rounded-full font-medium shrink-0">${items.length}</span>
+          </div>
+          <div class="space-y-2 min-h-[60px]">
+            ${items.map(k => `
+              <div class="candidate-card bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                <p class="font-medium text-sm text-gray-900">${k.nama}</p>
+                <p class="text-xs text-gray-400 mt-1">${k.exp} tahun exp • ${k.posisi}</p>
+                <div class="mt-2 admin-only">
+                  <select onchange="moveCandidateToStage(${k.id}, this.value)" class="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-indigo-400">
+                    <option value="">Pindah ke...</option>
+                    ${STAGES.filter(s => s !== stage).map(s => `<option value="${s}">${s}</option>`).join('')}
+                  </select>
+                </div>
+              </div>
+            `).join('') || '<p class="text-xs text-gray-400 text-center py-4">Kosong</p>'}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function openStageList(stage) {
+      currentStageName = stage;
+      const posisiFilter = document.getElementById('pipelinePosisiFilter')?.value || '';
+      let data = kandidatData.filter(k => k.tahap === stage);
+      if (posisiFilter) data = data.filter(k => k.posisi === posisiFilter);
+      currentStageList = data;
+      document.getElementById('stageListTitle').textContent = stage === 'Hired' ? 'Kandidat Hired' : 'Kandidat Rejected';
+      document.getElementById('stageListSubtitle').textContent = data.length + ' kandidat' + (posisiFilter ? ' • ' + posisiFilter : '');
+      document.getElementById('stageListSearch').value = '';
+      renderStageListBody(data);
+      document.getElementById('modalStageList').classList.remove('hidden');
+      document.getElementById('modalStageList').classList.add('flex');
+    }
+
+    function closeStageList() {
+      document.getElementById('modalStageList').classList.add('hidden');
+      document.getElementById('modalStageList').classList.remove('flex');
+      currentStageList = [];
+      currentStageName = '';
+    }
+
+    function filterStageList() {
+      const q = (document.getElementById('stageListSearch')?.value || '').toLowerCase();
+      const filtered = !q ? currentStageList : currentStageList.filter(k =>
+        k.nama.toLowerCase().includes(q) || k.posisi.toLowerCase().includes(q) || (k.email || '').toLowerCase().includes(q)
+      );
+      renderStageListBody(filtered);
+    }
+
+    function renderStageListBody(list) {
+      const body = document.getElementById('stageListBody');
+      if (!list.length) {
+        body.innerHTML = '<p class="text-center text-gray-400 py-10">Tidak ada kandidat.</p>';
+        return;
+      }
+      body.innerHTML = list.map(k => `
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+          <div class="w-10 h-10 rounded-full ${COLOR_MAP[k.color] || 'bg-gray-200 text-gray-600'} flex items-center justify-center font-semibold text-xs shrink-0">${k.initials}</div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-sm text-gray-900 truncate">${k.nama}</p>
+            <p class="text-xs text-gray-400 truncate">${k.posisi} • ${k.exp} thn exp • ${k.recruiter}</p>
+          </div>
+          <div class="text-right shrink-0">
+            <p class="text-xs text-gray-400">${k.tanggal || ''}</p>
+            <div class="mt-1 admin-only">
+              <select onchange="moveCandidateToStage(${k.id}, this.value); closeStageList();" class="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400">
+                <option value="">Pindah ke...</option>
+                ${STAGES.filter(s => s !== currentStageName).map(s => `<option value="${s}">${s}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    let pendingScheduleCandidate = null; // { id, newStage, oldStage }
+
+    function moveCandidateToStage(id, newStage) {
+      if (!newStage) return;
+      const k = kandidatData.find(c => c.id === id);
+      if (!k || k.tahap === newStage) return;
+      const oldStage = k.tahap;
+      k.tahap = newStage;
+      apiUpdate('kandidat', k.id, { tahap: newStage }).catch(console.warn);
+      // sync counts ke lowongan
+      syncLowonganCounts();
+      renderPipeline();
+      renderKandidat();
+      renderDashboard();
+      updateBadges();
+      showToast(`${k.nama}: ${oldStage} → ${newStage}`);
+
+      // Jika pindah ke Interview HR / Interview User → munculkan form jadwal
+      if (newStage === 'Interview HR' || newStage === 'Interview User') {
+        pendingScheduleCandidate = { id: k.id, newStage, oldStage };
+        openScheduleFromPipeline(k, newStage);
+      }
+    }
+
+    function openScheduleFromPipeline(k, stage) {
+      document.getElementById('schedPipeKandidat').value = k.nama;
+      document.getElementById('schedPipePosisi').value = k.posisi + ' • ' + stage;
+      document.getElementById('schedPipeTanggal').value = '';
+      document.getElementById('schedPipeWaktu').value = '10:00';
+      document.getElementById('schedPipeDurasi').value = '60';
+      document.getElementById('schedPipeInterviewer').value = '';
+      document.getElementById('schedPipeSubtitle').textContent = 'Jadwalkan ' + stage + ' untuk ' + k.nama;
+      document.getElementById('modalScheduleFromPipeline').classList.remove('hidden');
+      document.getElementById('modalScheduleFromPipeline').classList.add('flex');
+    }
+
+    function closeScheduleFromPipeline(skip) {
+      document.getElementById('modalScheduleFromPipeline').classList.add('hidden');
+      document.getElementById('modalScheduleFromPipeline').classList.remove('flex');
+      if (skip) {
+        pendingScheduleCandidate = null;
+      }
+    }
+
+    function submitScheduleFromPipeline(e) {
+      e.preventDefault();
+      if (!pendingScheduleCandidate) {
+        closeScheduleFromPipeline(true);
+        return;
+      }
+      const k = kandidatData.find(c => c.id === pendingScheduleCandidate.id);
+      if (!k) {
+        closeScheduleFromPipeline(true);
+        return;
+      }
+      const stage = pendingScheduleCandidate.newStage;
+      const tipe = stage === 'Interview HR' ? 'HR' : 'User';
+      const newId = Math.max(...interviewData.map(i => i.id), 0) + 1;
+      const newInt = {
+        id: newId,
+        kandidatId: k.id,
+        kandidat: k.nama,
+        posisi: k.posisi,
+        tanggal: document.getElementById('schedPipeTanggal').value,
+        waktu: document.getElementById('schedPipeWaktu').value,
+        durasi: parseInt(document.getElementById('schedPipeDurasi').value) || 60,
+        tipe: tipe,
+        interviewer: document.getElementById('schedPipeInterviewer').value || 'TBD',
+        status: 'Pending'
+      };
+      interviewData.push(newInt);
+      apiCreate('interview', newInt).catch(console.warn);
+      pendingScheduleCandidate = null;
+      closeScheduleFromPipeline(false);
+      renderInterview();
+      renderDashboard();
+      updateBadges();
+      showToast('Jadwal interview tersimpan di menu Jadwal Interview');
+    }
+
+    function moveKandidatStage(id) {
+      const k = kandidatData.find(c => c.id === id);
+      if (!k) return;
+      const options = STAGES.filter(s => s !== k.tahap).join('\n');
+      const choice = prompt(`Pindahkan ${k.nama} ke tahap:\n\n${STAGES.map((s,i) => `${i+1}. ${s}`).join('\n')}\n\nMasukkan nomor:`);
+      if (!choice) return;
+      const idx = parseInt(choice) - 1;
+      if (idx >= 0 && idx < STAGES.length) {
+        moveCandidateToStage(id, STAGES[idx]);
+      }
+    }
+
+    function syncLowonganCounts() {
+      lowonganData.forEach(job => {
+        const related = kandidatData.filter(k => k.posisi === job.title);
+        job.counts = {
+          applied: related.filter(k => k.tahap === 'ER').length,
+          screening: related.filter(k => k.tahap === 'Screening').length,
+          interview: related.filter(k => k.tahap === 'Interview HR' || k.tahap === 'Interview User').length,
+          offer: related.filter(k => k.tahap === 'Offering').length,
+          hired: related.filter(k => k.tahap === 'Hired').length
+        };
+        job.kandidat = related.length;
+        // update percent kasar
+        const hired = job.counts.hired;
+        const offer = job.counts.offer;
+        job.percent = Math.min(100, Math.round((hired * 100 + offer * 70 + job.counts.interview * 50 + job.counts.screening * 25) / Math.max(job.qty, 1)));
+      });
+      renderLowongan();
+    }
+
+    // ========== FITUR BARU: Interview ==========
+    function renderInterview() {
+      const tbody = document.getElementById('interviewTableBody');
+      let data = [...interviewData];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (interviewFilter === 'minggu') {
+        const weekEnd = new Date(today); weekEnd.setDate(today.getDate() + 7);
+        data = data.filter(i => {
+          const d = new Date(i.tanggal);
+          return d >= today && d <= weekEnd;
+        });
+      } else if (interviewFilter === 'bulan') {
+        data = data.filter(i => {
+          const d = new Date(i.tanggal);
+          return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+        });
+      }
+      data.sort((a, b) => new Date(a.tanggal + 'T' + a.waktu) - new Date(b.tanggal + 'T' + b.waktu));
+
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-gray-400 py-10">Tidak ada jadwal interview.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(i => {
+        const tgl = normalizeDate(i.tanggal);
+        const jam = normalizeTime(i.waktu) || '—';
+        const dateStr = formatInterviewDateDisplay(tgl);
+        const endTime = jam !== '—' ? addMinutes(jam, i.durasi || 60) : '—';
+        const tipeClass = { Technical: 'bg-blue-50 text-blue-600', Portfolio: 'bg-purple-50 text-purple-600', User: 'bg-sky-50 text-sky-600', Final: 'bg-emerald-50 text-emerald-600', HR: 'bg-amber-50 text-amber-600' }[i.tipe] || 'bg-gray-100 text-gray-600';
+        const statusClass = i.status === 'Confirmed' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600';
+        return `
+        <tr class="hover:bg-gray-50/50">
+          <td class="px-6 py-4">
+            <p class="font-medium text-gray-900">${dateStr}</p>
+            <p class="text-xs text-gray-400 mt-0.5">${jam} - ${endTime} WIB</p>
+          </td>
+          <td class="px-6 py-4 text-gray-700">${i.kandidat}</td>
+          <td class="px-6 py-4 text-gray-600">${i.posisi}</td>
+          <td class="px-6 py-4"><span class="text-xs ${tipeClass} px-2 py-1 rounded-lg font-medium">${i.tipe}</span></td>
+          <td class="px-6 py-4 text-gray-600">${i.interviewer}</td>
+          <td class="px-6 py-4"><span class="px-2.5 py-1 ${statusClass} rounded-full text-xs font-medium">${i.status}</span></td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <button onclick="viewInterview(${i.id})" class="text-indigo-600 hover:underline text-xs font-medium">Detail</button>
+            ${currentUser.role === 'admin' ? `<button onclick="openEditInterview(${i.id})" class="text-amber-600 hover:underline text-xs font-medium ml-2">Edit</button>` : ''}
+            ${currentUser.role === 'admin' ? `<button onclick="deleteInterview(${i.id})" class="text-red-400 hover:text-red-600 text-xs ml-2"><i class="fas fa-trash"></i></button>` : ''}
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function addMinutes(timeStr, mins) {
+      const [h, m] = timeStr.split(':').map(Number);
+      const total = h * 60 + m + mins;
+      const nh = Math.floor(total / 60) % 24;
+      const nm = total % 60;
+      return `${String(nh).padStart(2, '0')}:${String(nm).padStart(2, '0')}`;
+    }
+
+    function setInterviewFilter(f) {
+      interviewFilter = f;
+      ['minggu', 'bulan', 'semua'].forEach(x => {
+        const btn = document.getElementById('btnInterview' + x.charAt(0).toUpperCase() + x.slice(1));
+        if (!btn) return;
+        if (x === f) {
+          btn.className = 'px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow-sm shadow-indigo-200';
+        } else {
+          btn.className = 'px-4 py-2 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50 bg-white';
+        }
+      });
+      renderInterview();
+    }
+
+    function openTambahInterview() {
+      const sel = document.getElementById('newIntKandidat');
+      sel.innerHTML = '<option value="">Pilih kandidat</option>' + 
+        kandidatData.filter(k => !['Hired', 'Rejected'].includes(k.tahap))
+          .map(k => `<option value="${k.id}">${k.nama} — ${k.posisi}</option>`).join('');
+      document.getElementById('newIntPosisi').value = '';
+      document.getElementById('newIntTanggal').value = '';
+      document.getElementById('newIntWaktu').value = '10:00';
+      document.getElementById('newIntDurasi').value = '60';
+      document.getElementById('newIntTipe').value = '';
+      document.getElementById('newIntInterviewer').value = '';
+      document.getElementById('newIntStatus').value = 'Pending';
+      document.getElementById('modalTambahInterview').classList.remove('hidden');
+      document.getElementById('modalTambahInterview').classList.add('flex');
+    }
+    function closeTambahInterview() {
+      document.getElementById('modalTambahInterview').classList.add('hidden');
+      document.getElementById('modalTambahInterview').classList.remove('flex');
+    }
+    function onKandidatSelect() {
+      const id = parseInt(document.getElementById('newIntKandidat').value);
+      const k = kandidatData.find(c => c.id === id);
+      document.getElementById('newIntPosisi').value = k ? k.posisi : '';
+    }
+    function submitTambahInterview(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('newIntKandidat').value);
+      const k = kandidatData.find(c => c.id === id);
+      if (!k) return;
+      const newId = Math.max(...interviewData.map(i => i.id), 0) + 1;
+      const newInt = {
+        id: newId,
+        kandidatId: id,
+        kandidat: k.nama,
+        posisi: k.posisi,
+        tanggal: document.getElementById('newIntTanggal').value,
+        waktu: document.getElementById('newIntWaktu').value,
+        durasi: parseInt(document.getElementById('newIntDurasi').value) || 60,
+        tipe: document.getElementById('newIntTipe').value,
+        interviewer: document.getElementById('newIntInterviewer').value,
+        status: document.getElementById('newIntStatus').value
+      };
+      interviewData.push(newInt);
+      apiCreate('interview', newInt).catch(console.warn);
+      // auto move to Interview if still early stage
+      if (['ER', 'Screening', 'Pengisian identitas Kandidat', 'Psikotes'].includes(k.tahap)) {
+        k.tahap = 'Interview HR';
+        apiUpdate('kandidat', k.id, { tahap: 'Interview HR' }).catch(console.warn);
+        syncLowonganCounts();
+      }
+      renderInterview();
+      renderPipeline();
+      renderDashboard();
+      updateBadges();
+      closeTambahInterview();
+      showToast('Jadwal interview berhasil ditambahkan');
+    }
+
+    function viewInterview(id) {
+      const i = interviewData.find(x => x.id === id);
+      if (!i) return;
+      alert(`Interview Detail\n\nKandidat: ${i.kandidat}\nPosisi: ${i.posisi}\nTanggal: ${i.tanggal} ${i.waktu}\nTipe: ${i.tipe}\nInterviewer: ${i.interviewer}\nStatus: ${i.status}`);
+    }
+
+    function openEditInterview(id) {
+      const i = interviewData.find(x => x.id === id);
+      if (!i) return;
+      document.getElementById('editIntId').value = i.id;
+      document.getElementById('editIntKandidat').value = i.kandidat || '';
+      document.getElementById('editIntPosisi').value = i.posisi || '';
+      document.getElementById('editIntTanggal').value = i.tanggal || '';
+      document.getElementById('editIntWaktu').value = i.waktu || '10:00';
+      document.getElementById('editIntDurasi').value = i.durasi || 60;
+      document.getElementById('editIntTipe').value = i.tipe || 'HR';
+      document.getElementById('editIntInterviewer').value = i.interviewer || '';
+      document.getElementById('editIntStatus').value = i.status || 'Pending';
+      document.getElementById('modalEditInterview').classList.remove('hidden');
+      document.getElementById('modalEditInterview').classList.add('flex');
+    }
+
+    function closeEditInterview() {
+      document.getElementById('modalEditInterview').classList.add('hidden');
+      document.getElementById('modalEditInterview').classList.remove('flex');
+    }
+
+    function submitEditInterview(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('editIntId').value);
+      const i = interviewData.find(x => x.id === id);
+      if (!i) return;
+      i.tanggal = document.getElementById('editIntTanggal').value;
+      i.waktu = document.getElementById('editIntWaktu').value;
+      i.durasi = parseInt(document.getElementById('editIntDurasi').value) || 60;
+      i.tipe = document.getElementById('editIntTipe').value;
+      i.interviewer = document.getElementById('editIntInterviewer').value;
+      i.status = document.getElementById('editIntStatus').value;
+      apiUpdate('interview', id, {
+        tanggal: i.tanggal,
+        waktu: i.waktu,
+        durasi: i.durasi,
+        tipe: i.tipe,
+        interviewer: i.interviewer,
+        status: i.status
+      }).catch(console.warn);
+      closeEditInterview();
+      renderInterview();
+      renderDashboard();
+      updateBadges();
+      showToast('Jadwal interview berhasil diperbarui');
+    }
+
+    function deleteInterview(id) {
+      if (!confirm('Hapus jadwal interview ini?')) return;
+      interviewData = interviewData.filter(i => i.id !== id);
+      apiDelete('interview', id).catch(console.warn);
+      renderInterview();
+      renderDashboard();
+      updateBadges();
+    }
+
+    // ========== FITUR BARU: Dashboard dinamis ==========
+    function renderDashboard() {
+      const visibleJobs = getVisibleLowongan();
+      const today = new Date();
+      const thisMonth = today.getMonth();
+      const thisYear = today.getFullYear();
+
+      // Lowongan aktif
+      const lowonganAktif = visibleJobs.filter(j => !['Closed'].includes(j.status));
+      document.getElementById('statLowongan').textContent = lowonganAktif.length;
+      const onHoldCount = visibleJobs.filter(j => j.status === 'On Hold').length;
+      const closedCount = visibleJobs.filter(j => j.status === 'Closed').length;
+      document.getElementById('statLowonganSub').textContent =
+        visibleJobs.length === 0 ? 'Belum ada data' :
+        (onHoldCount || closedCount)
+          ? `${onHoldCount} On Hold • ${closedCount} Closed`
+          : `Total ${visibleJobs.length} lowongan`;
+
+      // Total kandidat
+      document.getElementById('statKandidat').textContent = kandidatData.length;
+      const tahapCounts = {};
+      kandidatData.forEach(k => { tahapCounts[k.tahap] = (tahapCounts[k.tahap] || 0) + 1; });
+      const topTahap = Object.entries(tahapCounts).sort((a, b) => b[1] - a[1])[0];
+      document.getElementById('statKandidatSub').textContent =
+        kandidatData.length === 0 ? 'Belum ada data' :
+        topTahap ? `Terbanyak di ${topTahap[0]} (${topTahap[1]})` : 'Dari spreadsheet';
+
+      // Interview bulan ini
+      const monthInterviews = interviewData.filter(i => {
+        if (!i.tanggal) return false;
+        const d = new Date(i.tanggal);
+        return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+      });
+      document.getElementById('statInterview').textContent = monthInterviews.length;
+      const pendingInt = monthInterviews.filter(i => i.status === 'Pending').length;
+      const confirmedInt = monthInterviews.filter(i => i.status === 'Confirmed').length;
+      document.getElementById('statInterviewSub').textContent =
+        monthInterviews.length === 0 ? 'Belum ada jadwal bulan ini' :
+        `${confirmedInt} Confirmed • ${pendingInt} Pending`;
+
+      // Hired bulan ini (tahap Hired; filter by tanggal if available)
+      const hiredAll = kandidatData.filter(k => k.tahap === 'Hired');
+      const hiredThisMonth = hiredAll.filter(k => {
+        if (!k.tanggal) return true; // jika tidak ada tanggal, hitung semua Hired
+        // coba parse tanggal id-ID atau ISO
+        const d = new Date(k.tanggal);
+        if (!isNaN(d.getTime())) return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+        return true;
+      });
+      document.getElementById('statHired').textContent = hiredThisMonth.length;
+      document.getElementById('statHiredSub').textContent =
+        hiredAll.length === 0 ? 'Belum ada yang hired' :
+        `Total hired: ${hiredAll.length}`;
+
+      // kandidat terbaru
+      const recent = [...kandidatData].sort((a, b) => b.id - a.id).slice(0, 4);
+      if (!recent.length) {
+        document.getElementById('dashboardKandidatBody').innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-8">Belum ada kandidat</td></tr>';
+      } else {
+      document.getElementById('dashboardKandidatBody').innerHTML = recent.map(k => {
+        const tahapClass = {
+          'ER': 'bg-slate-100 text-slate-600',
+          'Screening': 'bg-amber-50 text-amber-600',
+          'Pengisian identitas Kandidat': 'bg-cyan-50 text-cyan-600',
+          'Psikotes': 'bg-orange-50 text-orange-600',
+          'Interview HR': 'bg-blue-50 text-blue-600',
+          'Interview User': 'bg-indigo-50 text-indigo-600',
+          'Background Check': 'bg-violet-50 text-violet-600',
+          'Offering': 'bg-purple-50 text-purple-600',
+          'On Hold': 'bg-yellow-50 text-yellow-600',
+          'Hired': 'bg-emerald-50 text-emerald-600',
+          'Rejected': 'bg-red-50 text-red-600'
+        }[k.tahap] || 'bg-gray-100 text-gray-600';
+        return `
+        <tr class="hover:bg-gray-50/50">
+          <td class="px-6 py-3.5">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full ${COLOR_MAP[k.color] || 'bg-gray-100'} flex items-center justify-center font-semibold text-xs">${k.initials}</div>
+              <span class="font-medium text-gray-900">${k.nama}</span>
+            </div>
+          </td>
+          <td class="px-6 py-3.5 text-gray-600">${k.posisi}</td>
+          <td class="px-6 py-3.5"><span class="px-2.5 py-1 ${tahapClass} rounded-full text-xs font-medium">${k.tahap}</span></td>
+          <td class="px-6 py-3.5 text-gray-400">${k.tanggal}</td>
+        </tr>`;
+      }).join('');
+      }
+
+      // interview mendatang
+      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const upcoming = interviewData
+        .filter(i => {
+          const tgl = normalizeDate(i.tanggal);
+          if (!tgl) return false;
+          const d = new Date(tgl + 'T00:00:00');
+          return !isNaN(d.getTime()) && d >= todayStart;
+        })
+        .sort((a, b) => {
+          const da = new Date((normalizeDate(a.tanggal) || '') + 'T' + (normalizeTime(a.waktu) || '00:00'));
+          const db = new Date((normalizeDate(b.tanggal) || '') + 'T' + (normalizeTime(b.waktu) || '00:00'));
+          return da - db;
+        })
+        .slice(0, 5);
+      const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+      const bgColors = ['bg-indigo-50', 'bg-sky-50', 'bg-amber-50'];
+      document.getElementById('dashboardInterviewList').innerHTML = upcoming.length
+        ? upcoming.map((i, idx) => {
+            const tgl = normalizeDate(i.tanggal);
+            const jam = normalizeTime(i.waktu) || '—';
+            const d = new Date(tgl + 'T00:00:00');
+            const dayLabel = !isNaN(d.getTime()) ? dayNames[d.getDay()].toUpperCase() : '—';
+            const dateNum = !isNaN(d.getTime()) ? String(d.getDate()).padStart(2, '0') : '—';
+            const dateFull = formatInterviewDateDisplay(tgl);
+            return `
+            <div class="flex gap-3">
+              <div class="w-12 text-center shrink-0">
+                <p class="text-xs text-gray-400 font-medium">${dayLabel}</p>
+                <p class="text-xl font-bold text-indigo-600">${dateNum}</p>
+              </div>
+              <div class="flex-1 ${bgColors[idx % 3]} rounded-xl p-3">
+                <p class="font-medium text-sm text-gray-900">${i.kandidat || '—'}</p>
+                <p class="text-xs text-gray-500 mt-0.5">${dateFull} • ${jam} WIB</p>
+                <p class="text-xs text-gray-500 mt-0.5">${i.posisi || '—'} • ${i.interviewer || '—'}</p>
+              </div>
+            </div>`;
+          }).join('')
+        : '<p class="text-sm text-gray-400 text-center py-4">Tidak ada interview mendatang</p>';
+    }
+
+    // ========== FITUR BARU: Notifikasi & Badge ==========
+    function updateBadges() {
+      const needsAtt = getVisibleLowongan().filter(isLowonganNeedsAttention).length;
+      const badgeL = document.getElementById('badgeLowongan');
+      if (needsAtt > 0) {
+        badgeL.textContent = needsAtt;
+        badgeL.classList.remove('hidden');
+      } else {
+        badgeL.classList.add('hidden');
+      }
+
+      const today = new Date();
+      const todayStr = today.toISOString().slice(0, 10);
+      const todayInt = interviewData.filter(i => i.tanggal === todayStr).length;
+      const badgeI = document.getElementById('badgeInterview');
+      if (todayInt > 0) {
+        badgeI.textContent = todayInt;
+        badgeI.classList.remove('hidden');
+      } else {
+        badgeI.classList.add('hidden');
+      }
+
+      const totalNotif = needsAtt + todayInt;
+      const bell = document.getElementById('bellBadge');
+      if (totalNotif > 0) bell.classList.remove('hidden');
+      else bell.classList.add('hidden');
+    }
+
+    function showNotifPanel() {
+      const needsAtt = getVisibleLowongan().filter(isLowonganNeedsAttention);
+      const today = new Date();
+      const todayStr = today.toISOString().slice(0, 10);
+      const todayInt = interviewData.filter(i => i.tanggal === todayStr);
+      let html = '';
+      if (needsAtt.length) {
+        html += needsAtt.map(j => `
+          <div class="flex gap-3 p-3 bg-amber-50 rounded-xl">
+            <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
+            <div>
+              <p class="text-sm font-medium text-gray-900">${j.title}</p>
+              <p class="text-xs text-gray-500">Belum diupdate ≥ 7 hari</p>
+            </div>
+          </div>`).join('');
+      }
+      if (todayInt.length) {
+        html += todayInt.map(i => `
+          <div class="flex gap-3 p-3 bg-indigo-50 rounded-xl">
+            <i class="fas fa-calendar-check text-indigo-500 mt-0.5"></i>
+            <div>
+              <p class="text-sm font-medium text-gray-900">Interview: ${i.kandidat}</p>
+              <p class="text-xs text-gray-500">Hari ini • ${i.waktu} WIB • ${i.tipe}</p>
+            </div>
+          </div>`).join('');
+      }
+      if (!html) html = '<p class="text-center text-gray-400 py-6">Tidak ada notifikasi</p>';
+      document.getElementById('notifBody').innerHTML = html;
+      document.getElementById('modalNotif').classList.remove('hidden');
+      document.getElementById('modalNotif').classList.add('flex');
+    }
+    function closeNotif() {
+      document.getElementById('modalNotif').classList.add('hidden');
+      document.getElementById('modalNotif').classList.remove('flex');
+    }
+
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.className = 'fixed bottom-6 right-6 bg-gray-900 text-white px-5 py-3 rounded-xl text-sm shadow-lg z-[100] transition-opacity';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
+    }
+
+    // ========== Helper: Populate filter options ==========
+    function populateFilters() {
+      // pengaju options
+      const pengajus = [...new Set(lowonganData.map(j => j.pengaju))];
+      const selP = document.getElementById('filterLowonganPengaju');
+      if (selP) {
+        const cur = selP.value;
+        selP.innerHTML = '<option value="">Semua Pengaju</option>' + pengajus.map(p => `<option>${p}</option>`).join('');
+        selP.value = cur;
+      }
+      // posisi options for kandidat & pipeline
+      const posisis = [...new Set(lowonganData.map(j => j.title))];
+      const selK = document.getElementById('filterKandidatPosisi');
+      if (selK) {
+        const cur = selK.value;
+        selK.innerHTML = '<option value="">Semua Posisi</option>' + posisis.map(p => `<option>${p}</option>`).join('');
+        selK.value = cur;
+      }
+      const selPipe = document.getElementById('pipelinePosisiFilter');
+      if (selPipe) {
+        const cur = selPipe.value;
+        selPipe.innerHTML = '<option value="">Semua Posisi</option>' + posisis.map(p => `<option>${p}</option>`).join('');
+        selPipe.value = cur;
+      }
+    }
+  </script>
+</body>
+</html>
