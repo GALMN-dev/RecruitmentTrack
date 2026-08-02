@@ -18,6 +18,51 @@
     .role-card:hover { transform: translateY(-6px); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); }
     body.role-pengaju .admin-only { display: none !important; }
     .notif-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; background: #ef4444; color: white; font-size: 10px; font-weight: 700; border-radius: 9999px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+    #toastContainer { position: fixed; bottom: 24px; right: 24px; z-index: 200; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+    .toast-item {
+      pointer-events: auto;
+      min-width: 280px; max-width: 380px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px -12px rgba(0,0,0,.2), 0 0 0 1px rgba(0,0,0,.04);
+      padding: 14px 16px;
+      display: flex; align-items: flex-start; gap: 12px;
+      animation: toastIn .35s cubic-bezier(.22,1,.36,1);
+      overflow: hidden;
+      position: relative;
+    }
+    .toast-item::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; height: 3px;
+      background: currentColor; opacity: .35;
+      animation: toastBar 3.2s linear forwards;
+    }
+    .toast-item.toast-out { animation: toastOut .3s ease forwards; }
+    .toast-icon {
+      width: 36px; height: 36px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      font-size: 15px;
+    }
+    .toast-success { color: #059669; }
+    .toast-success .toast-icon { background: #ecfdf5; color: #059669; }
+    .toast-info { color: #4f46e5; }
+    .toast-info .toast-icon { background: #eef2ff; color: #4f46e5; }
+    .toast-warn { color: #d97706; }
+    .toast-warn .toast-icon { background: #fffbeb; color: #d97706; }
+    .toast-error { color: #dc2626; }
+    .toast-error .toast-icon { background: #fef2f2; color: #dc2626; }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(16px) scale(.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(12px) scale(.96); }
+    }
+    @keyframes toastBar {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
   </style>
 </head>
 <body class="bg-gray-50 role-pengaju">
@@ -100,7 +145,7 @@
             </div>
             <div>
               <h1 class="font-bold text-gray-900">Recruitment Tracker</h1>
-              <p class="text-xs text-gray-400">Copyright © 2026</p>
+              <p class="text-xs text-gray-400">Version 01 © 2026 mw</p>
             </div>
           </div>
         </div>
@@ -537,11 +582,8 @@
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Tipe Interview *</label>
           <select id="newIntTipe" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <option value="">Pilih tipe</option>
-            <option>Technical</option>
-            <option>Portfolio</option>
-            <option>User</option>
-            <option>Final</option>
             <option>HR</option>
+            <option>User</option>
           </select>
         </div>
         <div>
@@ -597,11 +639,8 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Tipe Interview</label>
           <select id="editIntTipe" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option>Technical</option>
-            <option>Portfolio</option>
-            <option>User</option>
-            <option>Final</option>
             <option>HR</option>
+            <option>User</option>
           </select>
         </div>
         <div>
@@ -635,9 +674,15 @@
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap *</label>
           <input type="text" id="newKanNama" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email *</label>
-          <input type="email" id="newKanEmail" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+            <input type="email" id="newKanEmail" placeholder="Opsional" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">No. Telepon</label>
+            <input type="tel" id="newKanTelepon" placeholder="Opsional" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Posisi *</label>
@@ -677,11 +722,19 @@
   </div>
 
   <!-- Modal Notifikasi -->
-  <div id="modalNotif" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-        <h3 class="font-semibold text-gray-900 text-lg">Notifikasi</h3>
-        <button onclick="closeNotif()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+  <div id="modalNotif" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-gray-100">
+      <div class="px-6 py-5 border-b border-gray-50 flex items-center justify-between bg-gradient-to-r from-indigo-50 to-white">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center">
+            <i class="fas fa-bell text-indigo-600"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 text-lg">Notifikasi</h3>
+            <p class="text-xs text-gray-400">Update rekrutmen terkini</p>
+          </div>
+        </div>
+        <button onclick="closeNotif()" class="w-8 h-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
       </div>
       <div id="notifBody" class="p-4 space-y-3 max-h-80 overflow-y-auto"></div>
     </div>
@@ -829,6 +882,7 @@
               id: Number(row.id) || 0,
               nama: row.nama || '',
               email: row.email || '',
+              telepon: row.telepon || '',
               posisi: row.posisi || '',
               sumber: row.sumber || '',
               tahap: row.tahap || 'ER',
@@ -1159,9 +1213,9 @@
     function enterAsPengaju() {
       document.body.classList.add('role-pengaju');
       document.body.classList.remove('role-admin');
-      currentUser = { name: 'Haloo!', role: 'pengaju' };
-      document.getElementById('userName').textContent = 'Haloo!';
-      document.getElementById('userRole').textContent = 'Pengaju (Viewer)';
+      currentUser = { name: 'Halo Pengaju', role: 'pengaju' };
+      document.getElementById('userName').textContent = 'Pengaju';
+      document.getElementById('userRole').textContent = 'Viewer';
       document.getElementById('roleBadge').textContent = 'Pengaju';
       document.getElementById('roleBadge').className = 'px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700';
       enterApp();
@@ -1276,6 +1330,7 @@
           'Hired': 'bg-emerald-50 text-emerald-600',
           'Rejected': 'bg-red-50 text-red-600'
         }[k.tahap] || 'bg-gray-100 text-gray-600';
+        const kontak = [k.email, k.telepon].filter(Boolean).join(' · ') || '—';
         return `
         <tr class="hover:bg-gray-50/50">
           <td class="px-6 py-4">
@@ -1283,7 +1338,7 @@
               <div class="w-9 h-9 rounded-full ${COLOR_MAP[k.color] || 'bg-gray-100 text-gray-600'} flex items-center justify-center font-semibold text-xs">${k.initials}</div>
               <div>
                 <p class="font-medium text-gray-900">${k.nama}</p>
-                <p class="text-xs text-gray-400">${k.email}</p>
+                <p class="text-xs text-gray-400">${kontak}</p>
               </div>
             </div>
           </td>
@@ -1291,9 +1346,10 @@
           <td class="px-6 py-4"><span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-lg">${k.sumber}</span></td>
           <td class="px-6 py-4"><span class="px-2.5 py-1 ${tahapClass} rounded-full text-xs font-medium">${k.tahap}</span></td>
           <td class="px-6 py-4 text-gray-400">${k.recruiter}</td>
-          <td class="px-6 py-4">
+          <td class="px-6 py-4 whitespace-nowrap">
             <button onclick="viewKandidat(${k.id})" class="text-indigo-600 hover:text-indigo-800 mr-2" title="Lihat"><i class="fas fa-eye"></i></button>
-            <button onclick="moveKandidatStage(${k.id})" class="admin-only text-gray-400 hover:text-gray-600" title="Pindah tahap"><i class="fas fa-exchange-alt"></i></button>
+            <button onclick="moveKandidatStage(${k.id})" class="admin-only text-gray-400 hover:text-gray-600 mr-2" title="Pindah tahap"><i class="fas fa-exchange-alt"></i></button>
+            <button onclick="deleteKandidat(${k.id})" class="admin-only text-red-400 hover:text-red-600" title="Hapus"><i class="fas fa-trash"></i></button>
           </td>
         </tr>`;
       }).join('');
@@ -1304,7 +1360,11 @@
       const posisi = document.getElementById('filterKandidatPosisi')?.value || '';
       const tahap = document.getElementById('filterKandidatTahap')?.value || '';
       let data = [...kandidatData];
-      if (search) data = data.filter(k => k.nama.toLowerCase().includes(search) || k.email.toLowerCase().includes(search));
+      if (search) data = data.filter(k =>
+        k.nama.toLowerCase().includes(search) ||
+        (k.email || '').toLowerCase().includes(search) ||
+        (k.telepon || '').toLowerCase().includes(search)
+      );
       if (posisi) data = data.filter(k => k.posisi === posisi);
       if (tahap) data = data.filter(k => k.tahap === tahap);
       renderKandidat(data);
@@ -1313,7 +1373,7 @@
     function viewKandidat(id) {
       const k = kandidatData.find(c => c.id === id);
       if (!k) return;
-      alert(`Kandidat: ${k.nama}\nPosisi: ${k.posisi}\nTahap: ${k.tahap}\nPengalaman: ${k.exp} tahun\nRecruiter: ${k.recruiter}`);
+      alert(`Kandidat: ${k.nama}\nEmail: ${k.email || '—'}\nTelepon: ${k.telepon || '—'}\nPosisi: ${k.posisi}\nTahap: ${k.tahap}\nPengalaman: ${k.exp} tahun\nRecruiter: ${k.recruiter}`);
     }
 
     function openTambahKandidat() {
@@ -1351,7 +1411,8 @@
       const newKan = {
         id: newId,
         nama,
-        email: document.getElementById('newKanEmail').value,
+        email: document.getElementById('newKanEmail').value || '',
+        telepon: document.getElementById('newKanTelepon').value || '',
         posisi: posisi,
         sumber: document.getElementById('newKanSumber').value,
         tahap: 'ER',
@@ -1371,6 +1432,37 @@
       closeTambahKandidat();
       document.getElementById('newKanNama').value = '';
       document.getElementById('newKanEmail').value = '';
+      document.getElementById('newKanTelepon').value = '';
+    }
+
+    function deleteKandidat(id) {
+      if (currentUser.role !== 'admin') {
+        alert('Hanya Tim Rekrutmen yang dapat menghapus kandidat.');
+        return;
+      }
+      const k = kandidatData.find(c => c.id === id);
+      if (!k) return;
+      if (k.tahap === 'Hired') {
+        const ok = confirm(
+          `PERINGATAN: "${k.nama}" sudah berstatus Hired.\n\nMenghapus kandidat hired dapat menghilangkan data penting.\n\nYakin ingin menghapus?`
+        );
+        if (!ok) return;
+        const ok2 = confirm(`Konfirmasi sekali lagi: hapus permanen kandidat Hired "${k.nama}"?`);
+        if (!ok2) return;
+      } else {
+        if (!confirm(`Hapus kandidat "${k.nama}"?\nPosisi: ${k.posisi}\nTahap: ${k.tahap}`)) return;
+      }
+      kandidatData = kandidatData.filter(c => c.id !== id);
+      apiDelete('kandidat', id).catch(console.warn);
+      // hapus juga jadwal interview terkait (opsional, lokal)
+      interviewData = interviewData.filter(i => i.kandidatId !== id);
+      syncLowonganCounts();
+      renderKandidat();
+      renderPipeline();
+      renderInterview();
+      renderDashboard();
+      updateBadges();
+      showToast(`Kandidat ${k.nama} dihapus`);
     }
 
     // ========== FITUR BARU: Pipeline interaktif ==========
@@ -1593,7 +1685,27 @@
         // update percent kasar
         const hired = job.counts.hired;
         const offer = job.counts.offer;
-        job.percent = Math.min(100, Math.round((hired * 100 + offer * 70 + job.counts.interview * 50 + job.counts.screening * 25) / Math.max(job.qty, 1)));
+        const qty = Math.max(job.qty, 1);
+        job.percent = Math.min(100, Math.round((hired * 100 + offer * 70 + job.counts.interview * 50 + job.counts.screening * 25) / qty));
+
+        // Jika kebutuhan terpenuhi (hired >= qty) → progress 100% & status Closed
+        if (hired >= qty) {
+          job.percent = 100;
+          if (job.status !== 'Closed') {
+            const prev = job.status;
+            job.status = 'Closed';
+            job.lastUpdate = new Date().toISOString().slice(0, 10);
+            if (job.id) {
+              apiUpdate('lowongan', job.id, {
+                status: 'Closed',
+                percent: 100,
+                kandidat: job.kandidat,
+                lastUpdate: job.lastUpdate
+              }).catch(console.warn);
+            }
+            showToast(`Lowongan "${job.title}" ditutup otomatis (Hired ${hired}/${qty})`, 'success');
+          }
+        }
       });
       renderLowongan();
     }
@@ -1957,25 +2069,35 @@
       let html = '';
       if (needsAtt.length) {
         html += needsAtt.map(j => `
-          <div class="flex gap-3 p-3 bg-amber-50 rounded-xl">
-            <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
-            <div>
-              <p class="text-sm font-medium text-gray-900">${j.title}</p>
-              <p class="text-xs text-gray-500">Belum diupdate ≥ 7 hari</p>
+          <div class="flex gap-3 p-3.5 bg-amber-50 rounded-2xl border border-amber-100">
+            <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <i class="fas fa-exclamation-triangle text-amber-600 text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-gray-900 truncate">${j.title}</p>
+              <p class="text-xs text-amber-700/80 mt-0.5">Belum diupdate ≥ 7 hari</p>
             </div>
           </div>`).join('');
       }
       if (todayInt.length) {
         html += todayInt.map(i => `
-          <div class="flex gap-3 p-3 bg-indigo-50 rounded-xl">
-            <i class="fas fa-calendar-check text-indigo-500 mt-0.5"></i>
-            <div>
-              <p class="text-sm font-medium text-gray-900">Interview: ${i.kandidat}</p>
-              <p class="text-xs text-gray-500">Hari ini • ${i.waktu} WIB • ${i.tipe}</p>
+          <div class="flex gap-3 p-3.5 bg-indigo-50 rounded-2xl border border-indigo-100">
+            <div class="w-9 h-9 rounded-xl bg-indigo-100 flex items-center justify-center shrink-0">
+              <i class="fas fa-calendar-check text-indigo-600 text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-gray-900 truncate">Interview: ${i.kandidat}</p>
+              <p class="text-xs text-indigo-700/80 mt-0.5">Hari ini • ${normalizeTime(i.waktu) || '—'} WIB • ${i.tipe || ''}</p>
             </div>
           </div>`).join('');
       }
-      if (!html) html = '<p class="text-center text-gray-400 py-6">Tidak ada notifikasi</p>';
+      if (!html) html = `
+        <div class="text-center py-10">
+          <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
+            <i class="fas fa-bell-slash text-gray-300 text-xl"></i>
+          </div>
+          <p class="text-sm text-gray-400">Tidak ada notifikasi</p>
+        </div>`;
       document.getElementById('notifBody').innerHTML = html;
       document.getElementById('modalNotif').classList.remove('hidden');
       document.getElementById('modalNotif').classList.add('flex');
@@ -1985,12 +2107,42 @@
       document.getElementById('modalNotif').classList.remove('flex');
     }
 
-    function showToast(msg) {
+    function showToast(msg, type) {
+      type = type || 'info';
+      let container = document.getElementById('toastContainer');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        document.body.appendChild(container);
+      }
+      const icons = {
+        success: 'fa-check-circle',
+        info: 'fa-info-circle',
+        warn: 'fa-exclamation-circle',
+        error: 'fa-times-circle'
+      };
+      const titles = {
+        success: 'Berhasil',
+        info: 'Info',
+        warn: 'Perhatian',
+        error: 'Gagal'
+      };
       const t = document.createElement('div');
-      t.className = 'fixed bottom-6 right-6 bg-gray-900 text-white px-5 py-3 rounded-xl text-sm shadow-lg z-[100] transition-opacity';
-      t.textContent = msg;
-      document.body.appendChild(t);
-      setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
+      t.className = `toast-item toast-${type}`;
+      t.innerHTML = `
+        <div class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></div>
+        <div class="flex-1 min-w-0 pt-0.5">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">${titles[type] || 'Info'}</p>
+          <p class="text-sm text-gray-800 mt-0.5 leading-snug">${msg}</p>
+        </div>
+        <button type="button" class="text-gray-300 hover:text-gray-500 transition shrink-0 mt-0.5" onclick="this.closest('.toast-item').remove()">
+          <i class="fas fa-times text-xs"></i>
+        </button>`;
+      container.appendChild(t);
+      setTimeout(() => {
+        t.classList.add('toast-out');
+        setTimeout(() => t.remove(), 300);
+      }, 3200);
     }
 
     // ========== Helper: Populate filter options ==========
