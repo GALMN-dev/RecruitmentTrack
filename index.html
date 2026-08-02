@@ -67,6 +67,50 @@
 </head>
 <body class="bg-gray-50 role-pengaju">
 
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 z-[300] hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl shadow-2xl px-8 py-7 flex flex-col items-center gap-4 min-w-[260px] border border-gray-100">
+      <div class="w-12 h-12 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin"></div>
+      <div class="text-center">
+        <p class="text-sm font-semibold text-gray-900" id="loadingTitle">Memuat data...</p>
+        <p class="text-xs text-gray-400 mt-1" id="loadingSub">Mengambil data dari spreadsheet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Konfirmasi Generic -->
+  <div id="modalConfirm" class="fixed inset-0 bg-black/40 z-[250] hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden border border-gray-100">
+      <div class="p-6 text-center">
+        <div id="confirmIconWrap" class="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-amber-50">
+          <i id="confirmIcon" class="fas fa-exclamation-triangle text-amber-500 text-xl"></i>
+        </div>
+        <h3 id="confirmTitle" class="font-bold text-gray-900 text-lg">Konfirmasi</h3>
+        <p id="confirmMessage" class="text-sm text-gray-500 mt-2 leading-relaxed whitespace-pre-line">—</p>
+      </div>
+      <div class="px-6 pb-6 flex gap-3">
+        <button type="button" id="confirmCancelBtn" onclick="resolveConfirm(false)" class="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50">Batal</button>
+        <button type="button" id="confirmOkBtn" onclick="resolveConfirm(true)" class="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition">Ya</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Alert Generic -->
+  <div id="modalAlert" class="fixed inset-0 bg-black/40 z-[250] hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden border border-gray-100">
+      <div class="p-6 text-center">
+        <div id="alertIconWrap" class="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-indigo-50">
+          <i id="alertIcon" class="fas fa-info-circle text-indigo-500 text-xl"></i>
+        </div>
+        <h3 id="alertTitle" class="font-bold text-gray-900 text-lg">Info</h3>
+        <p id="alertMessage" class="text-sm text-gray-500 mt-2 leading-relaxed whitespace-pre-line">—</p>
+      </div>
+      <div class="px-6 pb-6">
+        <button type="button" onclick="closeAppAlert()" class="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition">OK</button>
+      </div>
+    </div>
+  </div>
+
   <!-- LANDING -->
   <div id="landingPage" class="page active min-h-screen items-center justify-center p-6" style="background: linear-gradient(145deg, #4f46e5 0%, #312e81 100%);">
     <div class="w-full max-w-xl text-center">
@@ -778,9 +822,78 @@
           </div>
         </div>
       </div>
-      <div class="px-6 pb-6">
-        <button onclick="closeDetailKandidat()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-medium transition shadow-sm shadow-indigo-200">Tutup</button>
+      <div class="px-6 pb-6 flex gap-3">
+        <a id="detailKanWhatsApp" href="#" target="_blank" rel="noopener" class="hidden flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 rounded-xl text-sm font-medium transition text-center">
+          <i class="fab fa-whatsapp mr-1.5"></i>WhatsApp
+        </a>
+        <button type="button" onclick="openEditKandidatFromDetail()" class="admin-only flex-1 border border-indigo-200 text-indigo-600 hover:bg-indigo-50 py-2.5 rounded-xl text-sm font-medium transition">
+          <i class="fas fa-edit mr-1.5"></i>Edit
+        </button>
+        <button type="button" onclick="closeDetailKandidat()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-medium transition shadow-sm shadow-indigo-200">Tutup</button>
       </div>
+      <input type="hidden" id="detailKanId">
+    </div>
+  </div>
+
+  <!-- Modal Edit Kandidat -->
+  <div id="modalEditKandidat" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
+        <h3 class="font-semibold text-gray-900 text-lg">Edit Kandidat</h3>
+        <button onclick="closeEditKandidat()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+      </div>
+      <form onsubmit="submitEditKandidat(event)" class="p-6 space-y-5">
+        <input type="hidden" id="editKanId">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap *</label>
+          <input type="text" id="editKanNama" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+            <input type="email" id="editKanEmail" placeholder="Opsional" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">No. Telepon</label>
+            <input type="tel" id="editKanTelepon" placeholder="Opsional" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Posisi *</label>
+          <select id="editKanPosisi" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Sumber</label>
+            <select id="editKanSumber" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option>LinkedIn</option>
+              <option>Job Portal</option>
+              <option>Referral</option>
+              <option>Website</option>
+              <option>Lainnya</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pengalaman (tahun)</label>
+            <input type="number" id="editKanExp" min="0" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Recruiter</label>
+          <select id="editKanRecruiter" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <option value="Febrinita">Febrinita</option>
+            <option value="Rifki">Rifki</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Tahap</label>
+          <select id="editKanTahap" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-medium transition">Simpan</button>
+          <button type="button" onclick="closeEditKandidat()" class="px-5 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50">Batal</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -938,6 +1051,72 @@
       }
     }
 
+    function showLoading(title, sub) {
+      const el = document.getElementById('loadingOverlay');
+      if (title) document.getElementById('loadingTitle').textContent = title;
+      if (sub) document.getElementById('loadingSub').textContent = sub;
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+    }
+    function hideLoading() {
+      const el = document.getElementById('loadingOverlay');
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+    }
+
+    let _confirmResolver = null;
+    function showConfirm(message, options) {
+      options = options || {};
+      document.getElementById('confirmTitle').textContent = options.title || 'Konfirmasi';
+      document.getElementById('confirmMessage').textContent = message || '';
+      const icon = document.getElementById('confirmIcon');
+      const wrap = document.getElementById('confirmIconWrap');
+      const okBtn = document.getElementById('confirmOkBtn');
+      if (options.danger) {
+        icon.className = 'fas fa-trash-alt text-red-500 text-xl';
+        wrap.className = 'w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-red-50';
+        okBtn.className = 'flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-medium transition';
+        okBtn.textContent = options.okText || 'Hapus';
+      } else {
+        icon.className = 'fas fa-exclamation-triangle text-amber-500 text-xl';
+        wrap.className = 'w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-amber-50';
+        okBtn.className = 'flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition';
+        okBtn.textContent = options.okText || 'Ya';
+      }
+      document.getElementById('confirmCancelBtn').textContent = options.cancelText || 'Batal';
+      document.getElementById('modalConfirm').classList.remove('hidden');
+      document.getElementById('modalConfirm').classList.add('flex');
+      return new Promise(resolve => { _confirmResolver = resolve; });
+    }
+    function resolveConfirm(val) {
+      document.getElementById('modalConfirm').classList.add('hidden');
+      document.getElementById('modalConfirm').classList.remove('flex');
+      if (_confirmResolver) { _confirmResolver(val); _confirmResolver = null; }
+    }
+    function showAppAlert(message, options) {
+      options = options || {};
+      document.getElementById('alertTitle').textContent = options.title || 'Info';
+      document.getElementById('alertMessage').textContent = message || '';
+      const icon = document.getElementById('alertIcon');
+      const wrap = document.getElementById('alertIconWrap');
+      if (options.type === 'error') {
+        icon.className = 'fas fa-times-circle text-red-500 text-xl';
+        wrap.className = 'w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-red-50';
+      } else if (options.type === 'success') {
+        icon.className = 'fas fa-check-circle text-emerald-500 text-xl';
+        wrap.className = 'w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-emerald-50';
+      } else {
+        icon.className = 'fas fa-info-circle text-indigo-500 text-xl';
+        wrap.className = 'w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-indigo-50';
+      }
+      document.getElementById('modalAlert').classList.remove('hidden');
+      document.getElementById('modalAlert').classList.add('flex');
+    }
+    function closeAppAlert() {
+      document.getElementById('modalAlert').classList.add('hidden');
+      document.getElementById('modalAlert').classList.remove('flex');
+    }
+
     async function loadAllData() {
       try {
         const data = await apiRequest({ action: 'getAllSheets' });
@@ -946,7 +1125,7 @@
           lowonganData = [];
           kandidatData = [];
           interviewData = [];
-          return;
+          return { ok: false, error: (data && data.error) || 'Gagal memuat data' };
         }
         // Sumber kebenaran = spreadsheet (boleh kosong)
         lowonganData = Array.isArray(data.lowongan)
@@ -1013,11 +1192,13 @@
           : [];
         // Hitung ulang jumlah kandidat & progress dari data kandidat (sumber kebenaran)
         syncLowonganCountsFromData();
+        return { ok: true };
       } catch (err) {
         console.warn('Gagal load dari Sheets:', err);
         lowonganData = [];
         kandidatData = [];
         interviewData = [];
+        return { ok: false, error: String(err) };
       }
     }
 
@@ -1188,12 +1369,15 @@
           ${job.note && job.note !== '_' && job.note !== '"_"' ? `<div class="bg-gray-50 rounded-lg p-2.5 mb-3"><p class="text-xs text-gray-500 line-clamp-2">"${job.note}"</p></div>` : ''}
           <div class="flex items-center justify-between pt-3 border-t border-gray-50">
             <div class="text-xs text-gray-400">Diajukan: <span class="text-gray-600">${job.pengaju}</span></div>
-            <div class="flex gap-3">
+            <div class="flex gap-3 items-center">
               <button onclick="openHistory(${index})" class="text-gray-500 text-sm font-medium hover:text-indigo-600">
                 <i class="fas fa-history mr-1"></i>Riwayat
               </button>
               <button onclick="openUpdateProgress(${index})" class="admin-only text-indigo-600 text-sm font-medium hover:underline">
                 <i class="fas fa-edit mr-1"></i>Update
+              </button>
+              <button onclick="deleteLowongan(${index})" class="admin-only text-red-400 hover:text-red-600 text-sm font-medium" title="Hapus lowongan">
+                <i class="fas fa-trash"></i>
               </button>
             </div>
           </div>
@@ -1368,7 +1552,7 @@
         document.getElementById('roleBadge').className = 'px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700';
         enterApp();
       } else {
-        alert('Email atau password salah.');
+        showAppAlert('Email atau password salah.', { title: 'Login gagal', type: 'error' });
       }
     }
 
@@ -1389,7 +1573,16 @@
       document.getElementById('landingPage').classList.remove('active');
       document.getElementById('adminLoginPage').classList.remove('active');
       document.getElementById('appPage').classList.add('active');
-      await loadAllData();
+      showLoading('Memuat data...', 'Mengambil data dari spreadsheet');
+      const result = await loadAllData();
+      hideLoading();
+      if (!result || !result.ok) {
+        showAppAlert(
+          (result && result.error ? result.error + '\n\n' : '') +
+          'Data tidak dapat dimuat dari spreadsheet.\nPeriksa koneksi atau URL API.',
+          { title: 'Gagal sinkronisasi', type: 'error' }
+        );
+      }
       populateFilters();
       renderLowongan();
       renderKandidat();
@@ -1483,6 +1676,7 @@
           <td class="px-6 py-4 text-gray-400">${k.recruiter}</td>
           <td class="px-6 py-4 whitespace-nowrap">
             <button onclick="viewKandidat(${k.id})" class="text-indigo-600 hover:text-indigo-800 mr-2" title="Lihat"><i class="fas fa-eye"></i></button>
+            <button onclick="openEditKandidat(${k.id})" class="admin-only text-amber-500 hover:text-amber-600 mr-2" title="Edit"><i class="fas fa-edit"></i></button>
             <button onclick="moveKandidatStage(${k.id})" class="admin-only text-gray-400 hover:text-gray-600 mr-2" title="Pindah tahap"><i class="fas fa-exchange-alt"></i></button>
             <button onclick="deleteKandidat(${k.id})" class="admin-only text-red-400 hover:text-red-600" title="Hapus"><i class="fas fa-trash"></i></button>
           </td>
@@ -1508,6 +1702,7 @@
     function viewKandidat(id) {
       const k = kandidatData.find(c => c.id === id);
       if (!k) return;
+      document.getElementById('detailKanId').value = k.id;
       const avatar = document.getElementById('detailKanAvatar');
       avatar.textContent = k.initials || '??';
       avatar.className = `w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-lg ${COLOR_MAP[k.color] || 'bg-indigo-100 text-indigo-600'}`;
@@ -1534,6 +1729,19 @@
       document.getElementById('detailKanExp').textContent = (k.exp != null ? k.exp : 0) + ' tahun';
       document.getElementById('detailKanRecruiter').textContent = k.recruiter || '—';
       document.getElementById('detailKanSumber').textContent = k.sumber || '—';
+      // WhatsApp button
+      const waBtn = document.getElementById('detailKanWhatsApp');
+      const phone = String(k.telepon || '').replace(/\D/g, '');
+      if (phone) {
+        let wa = phone;
+        if (wa.startsWith('0')) wa = '62' + wa.slice(1);
+        else if (!wa.startsWith('62')) wa = '62' + wa;
+        waBtn.href = `https://wa.me/${wa}`;
+        waBtn.classList.remove('hidden');
+      } else {
+        waBtn.href = '#';
+        waBtn.classList.add('hidden');
+      }
       document.getElementById('modalDetailKandidat').classList.remove('hidden');
       document.getElementById('modalDetailKandidat').classList.add('flex');
     }
@@ -1541,6 +1749,64 @@
     function closeDetailKandidat() {
       document.getElementById('modalDetailKandidat').classList.add('hidden');
       document.getElementById('modalDetailKandidat').classList.remove('flex');
+    }
+
+    function openEditKandidatFromDetail() {
+      const id = parseInt(document.getElementById('detailKanId').value);
+      closeDetailKandidat();
+      if (id) openEditKandidat(id);
+    }
+
+    function openEditKandidat(id) {
+      const k = kandidatData.find(c => c.id === id);
+      if (!k) return;
+      document.getElementById('editKanId').value = k.id;
+      document.getElementById('editKanNama').value = k.nama || '';
+      document.getElementById('editKanEmail').value = k.email || '';
+      document.getElementById('editKanTelepon').value = k.telepon || '';
+      const selPos = document.getElementById('editKanPosisi');
+      const posisis = [...new Set([k.posisi, ...lowonganData.map(j => j.title)].filter(Boolean))];
+      selPos.innerHTML = posisis.map(p => `<option value="${p}" ${p === k.posisi ? 'selected' : ''}>${p}</option>`).join('');
+      document.getElementById('editKanSumber').value = k.sumber || 'LinkedIn';
+      document.getElementById('editKanExp').value = k.exp != null ? k.exp : 0;
+      document.getElementById('editKanRecruiter').value = k.recruiter === 'Rifki' ? 'Rifki' : 'Febrinita';
+      const selTahap = document.getElementById('editKanTahap');
+      selTahap.innerHTML = STAGES.map(s => `<option value="${s}" ${s === k.tahap ? 'selected' : ''}>${s}</option>`).join('');
+      document.getElementById('modalEditKandidat').classList.remove('hidden');
+      document.getElementById('modalEditKandidat').classList.add('flex');
+    }
+
+    function closeEditKandidat() {
+      document.getElementById('modalEditKandidat').classList.add('hidden');
+      document.getElementById('modalEditKandidat').classList.remove('flex');
+    }
+
+    function submitEditKandidat(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('editKanId').value);
+      const k = kandidatData.find(c => c.id === id);
+      if (!k) return;
+      const nama = document.getElementById('editKanNama').value.trim();
+      if (!nama) return;
+      k.nama = nama;
+      k.email = document.getElementById('editKanEmail').value.trim();
+      k.telepon = document.getElementById('editKanTelepon').value.trim();
+      k.posisi = document.getElementById('editKanPosisi').value;
+      k.sumber = document.getElementById('editKanSumber').value;
+      k.exp = parseInt(document.getElementById('editKanExp').value) || 0;
+      k.recruiter = document.getElementById('editKanRecruiter').value;
+      const newTahap = document.getElementById('editKanTahap').value;
+      const oldTahap = k.tahap;
+      k.tahap = newTahap;
+      k.initials = nama.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      apiUpdate('kandidat', k.id, {
+        nama: k.nama, email: k.email, telepon: k.telepon, posisi: k.posisi,
+        sumber: k.sumber, exp: k.exp, recruiter: k.recruiter, tahap: k.tahap, initials: k.initials
+      }).catch(console.warn);
+      if (oldTahap !== newTahap) syncLowonganCounts();
+      else { renderKandidat(); renderPipeline(); renderDashboard(); }
+      closeEditKandidat();
+      showToast('Data kandidat diperbarui', 'success');
     }
 
     function openTambahKandidat() {
@@ -1563,12 +1829,12 @@
       e.preventDefault();
       const posisi = document.getElementById('newKanPosisi').value;
       if (!posisi) {
-        alert('Pilih posisi terlebih dahulu.');
+        showAppAlert('Pilih posisi terlebih dahulu.', { title: 'Posisi wajib', type: 'error' });
         return;
       }
       const job = lowonganData.find(j => j.title === posisi);
       if (!job || job.status !== 'Aktif') {
-        alert('Posisi ini tidak aktif (On Hold / Closed).\nAktifkan dulu di menu Lowongan sebelum menambah kandidat.');
+        showAppAlert('Posisi ini tidak aktif (On Hold / Closed).\nAktifkan dulu di menu Lowongan sebelum menambah kandidat.', { title: 'Posisi tidak aktif', type: 'error' });
         return;
       }
       const nama = document.getElementById('newKanNama').value;
@@ -1602,26 +1868,33 @@
       document.getElementById('newKanTelepon').value = '';
     }
 
-    function deleteKandidat(id) {
+    async function deleteKandidat(id) {
       if (currentUser.role !== 'admin') {
-        alert('Hanya Tim Rekrutmen yang dapat menghapus kandidat.');
+        showAppAlert('Hanya Tim Rekrutmen yang dapat menghapus kandidat.', { title: 'Akses ditolak', type: 'error' });
         return;
       }
       const k = kandidatData.find(c => c.id === id);
       if (!k) return;
       if (k.tahap === 'Hired') {
-        const ok = confirm(
-          `PERINGATAN: "${k.nama}" sudah berstatus Hired.\n\nMenghapus kandidat hired dapat menghilangkan data penting.\n\nYakin ingin menghapus?`
+        const ok = await showConfirm(
+          `"${k.nama}" sudah berstatus Hired.\nMenghapus kandidat hired dapat menghilangkan data penting.\n\nYakin ingin menghapus?`,
+          { title: 'Peringatan — Kandidat Hired', danger: true, okText: 'Lanjutkan' }
         );
         if (!ok) return;
-        const ok2 = confirm(`Konfirmasi sekali lagi: hapus permanen kandidat Hired "${k.nama}"?`);
+        const ok2 = await showConfirm(
+          `Konfirmasi sekali lagi: hapus permanen kandidat Hired "${k.nama}"?`,
+          { title: 'Konfirmasi final', danger: true, okText: 'Hapus permanen' }
+        );
         if (!ok2) return;
       } else {
-        if (!confirm(`Hapus kandidat "${k.nama}"?\nPosisi: ${k.posisi}\nTahap: ${k.tahap}`)) return;
+        const ok = await showConfirm(
+          `Hapus kandidat "${k.nama}"?\nPosisi: ${k.posisi}\nTahap: ${k.tahap}`,
+          { title: 'Hapus kandidat', danger: true, okText: 'Hapus' }
+        );
+        if (!ok) return;
       }
       kandidatData = kandidatData.filter(c => c.id !== id);
       apiDelete('kandidat', id).catch(console.warn);
-      // hapus juga jadwal interview terkait (opsional, lokal)
       interviewData = interviewData.filter(i => i.kandidatId !== id);
       syncLowonganCounts();
       renderKandidat();
@@ -1629,7 +1902,29 @@
       renderInterview();
       renderDashboard();
       updateBadges();
-      showToast(`Kandidat ${k.nama} dihapus`);
+      showToast(`Kandidat ${k.nama} dihapus`, 'success');
+    }
+
+    async function deleteLowongan(index) {
+      if (currentUser.role !== 'admin') {
+        showAppAlert('Hanya Tim Rekrutmen yang dapat menghapus lowongan.', { title: 'Akses ditolak', type: 'error' });
+        return;
+      }
+      const job = lowonganData[index];
+      if (!job) return;
+      const related = kandidatData.filter(k => (k.posisi || '').trim().toLowerCase() === (job.title || '').trim().toLowerCase());
+      const msg = related.length
+        ? `Hapus lowongan "${job.title}"?\n\nMasih ada ${related.length} kandidat terkait. Data kandidat tidak ikut terhapus.`
+        : `Hapus lowongan "${job.title}"?`;
+      const ok = await showConfirm(msg, { title: 'Hapus lowongan', danger: true, okText: 'Hapus' });
+      if (!ok) return;
+      if (job.id) apiDelete('lowongan', job.id).catch(console.warn);
+      lowonganData.splice(index, 1);
+      populateFilters();
+      renderLowongan();
+      renderDashboard();
+      updateBadges();
+      showToast(`Lowongan "${job.title}" dihapus`, 'success');
     }
 
     // ========== FITUR BARU: Pipeline interaktif ==========
@@ -2005,7 +2300,12 @@
     function viewInterview(id) {
       const i = interviewData.find(x => x.id === id);
       if (!i) return;
-      alert(`Interview Detail\n\nKandidat: ${i.kandidat}\nPosisi: ${i.posisi}\nTanggal: ${i.tanggal} ${i.waktu}\nTipe: ${i.tipe}\nInterviewer: ${i.interviewer}\nStatus: ${i.status}`);
+      const tgl = formatInterviewDateDisplay(normalizeDate(i.tanggal));
+      const jam = normalizeTime(i.waktu) || '—';
+      showAppAlert(
+        `Kandidat: ${i.kandidat}\nPosisi: ${i.posisi}\nTanggal: ${tgl}\nWaktu: ${jam} WIB\nTipe: ${i.tipe}\nInterviewer: ${i.interviewer}\nStatus: ${i.status}`,
+        { title: 'Detail Interview' }
+      );
     }
 
     function openEditInterview(id) {
@@ -2055,13 +2355,15 @@
       showToast('Jadwal interview berhasil diperbarui');
     }
 
-    function deleteInterview(id) {
-      if (!confirm('Hapus jadwal interview ini?')) return;
+    async function deleteInterview(id) {
+      const ok = await showConfirm('Hapus jadwal interview ini?', { title: 'Hapus jadwal', danger: true, okText: 'Hapus' });
+      if (!ok) return;
       interviewData = interviewData.filter(i => i.id !== id);
       apiDelete('interview', id).catch(console.warn);
       renderInterview();
       renderDashboard();
       updateBadges();
+      showToast('Jadwal interview dihapus', 'success');
     }
 
     // ========== FITUR BARU: Dashboard dinamis ==========
