@@ -721,6 +721,96 @@
     </div>
   </div>
 
+  <!-- Modal Detail Kandidat -->
+  <div id="modalDetailKandidat" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-gray-100">
+      <div class="px-6 pt-6 pb-4 bg-gradient-to-br from-indigo-50 via-white to-sky-50">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-4">
+            <div id="detailKanAvatar" class="w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-lg bg-indigo-100 text-indigo-600">—</div>
+            <div>
+              <h3 id="detailKanNama" class="font-bold text-gray-900 text-lg leading-tight">—</h3>
+              <p id="detailKanPosisi" class="text-sm text-gray-500 mt-0.5">—</p>
+            </div>
+          </div>
+          <button onclick="closeDetailKandidat()" class="w-8 h-8 rounded-full hover:bg-white/80 text-gray-400 hover:text-gray-600 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="mt-4">
+          <span id="detailKanTahap" class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">—</span>
+        </div>
+      </div>
+      <div class="px-6 py-5 space-y-3">
+        <div class="flex items-center gap-3 p-3 rounded-2xl bg-gray-50">
+          <div class="w-9 h-9 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400"><i class="fas fa-envelope text-sm"></i></div>
+          <div class="min-w-0">
+            <p class="text-[10px] uppercase tracking-wide text-gray-400 font-medium">Email</p>
+            <p id="detailKanEmail" class="text-sm text-gray-800 truncate">—</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 p-3 rounded-2xl bg-gray-50">
+          <div class="w-9 h-9 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400"><i class="fas fa-phone text-sm"></i></div>
+          <div class="min-w-0">
+            <p class="text-[10px] uppercase tracking-wide text-gray-400 font-medium">Telepon</p>
+            <p id="detailKanTelepon" class="text-sm text-gray-800">—</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex items-center gap-3 p-3 rounded-2xl bg-gray-50">
+            <div class="w-9 h-9 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400"><i class="fas fa-briefcase text-sm"></i></div>
+            <div class="min-w-0">
+              <p class="text-[10px] uppercase tracking-wide text-gray-400 font-medium">Pengalaman</p>
+              <p id="detailKanExp" class="text-sm text-gray-800">—</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-2xl bg-gray-50">
+            <div class="w-9 h-9 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400"><i class="fas fa-user-tie text-sm"></i></div>
+            <div class="min-w-0">
+              <p class="text-[10px] uppercase tracking-wide text-gray-400 font-medium">Recruiter</p>
+              <p id="detailKanRecruiter" class="text-sm text-gray-800 truncate">—</p>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 p-3 rounded-2xl bg-gray-50">
+          <div class="w-9 h-9 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400"><i class="fas fa-share-alt text-sm"></i></div>
+          <div class="min-w-0">
+            <p class="text-[10px] uppercase tracking-wide text-gray-400 font-medium">Sumber</p>
+            <p id="detailKanSumber" class="text-sm text-gray-800">—</p>
+          </div>
+        </div>
+      </div>
+      <div class="px-6 pb-6">
+        <button onclick="closeDetailKandidat()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-medium transition shadow-sm shadow-indigo-200">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Pindah Tahap Kandidat -->
+  <div id="modalPindahTahap" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-gray-100">
+      <div class="px-6 py-5 border-b border-gray-50 flex items-center justify-between bg-gradient-to-r from-indigo-50 to-white">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center">
+            <i class="fas fa-exchange-alt text-indigo-600"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 text-lg">Pindah Tahap</h3>
+            <p class="text-xs text-gray-400" id="pindahTahapSubtitle">Pilih tahap baru</p>
+          </div>
+        </div>
+        <button onclick="closePindahTahap()" class="w-8 h-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="p-5">
+        <input type="hidden" id="pindahTahapKandidatId">
+        <div class="mb-4 p-3.5 bg-gray-50 rounded-2xl">
+          <p class="text-sm font-semibold text-gray-900" id="pindahTahapNama">—</p>
+          <p class="text-xs text-gray-500 mt-0.5" id="pindahTahapInfo">—</p>
+        </div>
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Pilih tahap</p>
+        <div id="pindahTahapList" class="space-y-2 max-h-72 overflow-y-auto"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Notifikasi -->
   <div id="modalNotif" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-gray-100">
@@ -921,12 +1011,57 @@
               };
             })
           : [];
+        // Hitung ulang jumlah kandidat & progress dari data kandidat (sumber kebenaran)
+        syncLowonganCountsFromData();
       } catch (err) {
         console.warn('Gagal load dari Sheets:', err);
         lowonganData = [];
         kandidatData = [];
         interviewData = [];
       }
+    }
+
+    // Hitung counts/percent dari kandidatData tanpa render (dipakai saat load)
+    function syncLowonganCountsFromData(persistClose) {
+      lowonganData.forEach(job => {
+        const titleNorm = (job.title || '').trim().toLowerCase();
+        const related = kandidatData.filter(k => (k.posisi || '').trim().toLowerCase() === titleNorm);
+        job.counts = {
+          applied: related.filter(k => k.tahap === 'ER').length,
+          screening: related.filter(k => k.tahap === 'Screening').length,
+          interview: related.filter(k => k.tahap === 'Interview HR' || k.tahap === 'Interview User').length,
+          offer: related.filter(k => k.tahap === 'Offering').length,
+          hired: related.filter(k => k.tahap === 'Hired').length
+        };
+        job.kandidat = related.length;
+        const hired = job.counts.hired;
+        const offer = job.counts.offer;
+        const qty = Math.max(Number(job.qty) || 1, 1);
+        job.qty = qty;
+        job.percent = Math.min(100, Math.round((hired * 100 + offer * 70 + job.counts.interview * 50 + job.counts.screening * 25) / qty));
+        if (hired >= qty) {
+          job.percent = 100;
+          if (job.status !== 'Closed') {
+            job.status = 'Closed';
+            job.lastUpdate = new Date().toISOString().slice(0, 10);
+            if (persistClose) {
+              if (job.id) {
+                apiUpdate('lowongan', job.id, {
+                  status: 'Closed',
+                  percent: 100,
+                  kandidat: job.kandidat,
+                  lastUpdate: job.lastUpdate
+                }).catch(console.warn);
+              }
+              showToast(`Lowongan "${job.title}" ditutup otomatis (Hired ${hired}/${qty})`, 'success');
+            }
+          }
+        }
+        // bersihkan note placeholder
+        if (job.note && (String(job.note).trim() === '_' || String(job.note).trim() === '"_"' || String(job.note).trim() === '')) {
+          job.note = '';
+        }
+      });
     }
 
     async function apiCreate(sheet, data) {
@@ -1050,7 +1185,7 @@
             <span><i class="fas fa-user-plus mr-1.5 text-gray-300"></i>Butuh ${job.qty} orang</span>
             <span><i class="fas fa-clock mr-1.5 text-gray-300"></i>${job.hari || 0} hari</span>
           </div>
-          ${job.note ? `<div class="bg-gray-50 rounded-lg p-2.5 mb-3"><p class="text-xs text-gray-500 line-clamp-2">"${job.note}"</p></div>` : ''}
+          ${job.note && job.note !== '_' && job.note !== '"_"' ? `<div class="bg-gray-50 rounded-lg p-2.5 mb-3"><p class="text-xs text-gray-500 line-clamp-2">"${job.note}"</p></div>` : ''}
           <div class="flex items-center justify-between pt-3 border-t border-gray-50">
             <div class="text-xs text-gray-400">Diajukan: <span class="text-gray-600">${job.pengaju}</span></div>
             <div class="flex gap-3">
@@ -1213,9 +1348,9 @@
     function enterAsPengaju() {
       document.body.classList.add('role-pengaju');
       document.body.classList.remove('role-admin');
-      currentUser = { name: 'Halo Pengaju', role: 'pengaju' };
+      currentUser = { name: 'Haloo!!', role: 'pengaju' };
       document.getElementById('userName').textContent = 'Pengaju';
-      document.getElementById('userRole').textContent = 'Viewer';
+      document.getElementById('userRole').textContent = 'As Viewer';
       document.getElementById('roleBadge').textContent = 'Pengaju';
       document.getElementById('roleBadge').className = 'px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700';
       enterApp();
@@ -1373,7 +1508,39 @@
     function viewKandidat(id) {
       const k = kandidatData.find(c => c.id === id);
       if (!k) return;
-      alert(`Kandidat: ${k.nama}\nEmail: ${k.email || '—'}\nTelepon: ${k.telepon || '—'}\nPosisi: ${k.posisi}\nTahap: ${k.tahap}\nPengalaman: ${k.exp} tahun\nRecruiter: ${k.recruiter}`);
+      const avatar = document.getElementById('detailKanAvatar');
+      avatar.textContent = k.initials || '??';
+      avatar.className = `w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-lg ${COLOR_MAP[k.color] || 'bg-indigo-100 text-indigo-600'}`;
+      document.getElementById('detailKanNama').textContent = k.nama || '—';
+      document.getElementById('detailKanPosisi').textContent = k.posisi || '—';
+      const tahapEl = document.getElementById('detailKanTahap');
+      const tahapClass = {
+        'ER': 'bg-slate-100 text-slate-600',
+        'Screening': 'bg-amber-50 text-amber-700',
+        'Pengisian identitas Kandidat': 'bg-cyan-50 text-cyan-700',
+        'Psikotes': 'bg-orange-50 text-orange-700',
+        'Interview HR': 'bg-blue-50 text-blue-700',
+        'Interview User': 'bg-indigo-50 text-indigo-700',
+        'Background Check': 'bg-violet-50 text-violet-700',
+        'Offering': 'bg-purple-50 text-purple-700',
+        'On Hold': 'bg-yellow-50 text-yellow-700',
+        'Hired': 'bg-emerald-50 text-emerald-700',
+        'Rejected': 'bg-red-50 text-red-700'
+      }[k.tahap] || 'bg-gray-100 text-gray-600';
+      tahapEl.className = `inline-flex px-3 py-1 rounded-full text-xs font-semibold ${tahapClass}`;
+      tahapEl.textContent = k.tahap || '—';
+      document.getElementById('detailKanEmail').textContent = k.email || '—';
+      document.getElementById('detailKanTelepon').textContent = k.telepon || '—';
+      document.getElementById('detailKanExp').textContent = (k.exp != null ? k.exp : 0) + ' tahun';
+      document.getElementById('detailKanRecruiter').textContent = k.recruiter || '—';
+      document.getElementById('detailKanSumber').textContent = k.sumber || '—';
+      document.getElementById('modalDetailKandidat').classList.remove('hidden');
+      document.getElementById('modalDetailKandidat').classList.add('flex');
+    }
+
+    function closeDetailKandidat() {
+      document.getElementById('modalDetailKandidat').classList.add('hidden');
+      document.getElementById('modalDetailKandidat').classList.remove('flex');
     }
 
     function openTambahKandidat() {
@@ -1662,51 +1829,44 @@
     function moveKandidatStage(id) {
       const k = kandidatData.find(c => c.id === id);
       if (!k) return;
-      const options = STAGES.filter(s => s !== k.tahap).join('\n');
-      const choice = prompt(`Pindahkan ${k.nama} ke tahap:\n\n${STAGES.map((s,i) => `${i+1}. ${s}`).join('\n')}\n\nMasukkan nomor:`);
-      if (!choice) return;
-      const idx = parseInt(choice) - 1;
-      if (idx >= 0 && idx < STAGES.length) {
-        moveCandidateToStage(id, STAGES[idx]);
-      }
+      document.getElementById('pindahTahapKandidatId').value = k.id;
+      document.getElementById('pindahTahapNama').textContent = k.nama;
+      document.getElementById('pindahTahapInfo').textContent = `${k.posisi} • Saat ini: ${k.tahap}`;
+      document.getElementById('pindahTahapSubtitle').textContent = 'Pilih tahap baru untuk ' + k.nama;
+      const list = document.getElementById('pindahTahapList');
+      list.innerHTML = STAGES.map(s => {
+        const isCurrent = s === k.tahap;
+        const colors = STAGE_COLORS[s] || { badge: 'bg-gray-100 text-gray-600' };
+        return `
+          <button type="button"
+            onclick="${isCurrent ? 'return' : `confirmPindahTahap('${s.replace(/'/g, "\\'")}')`}"
+            class="w-full text-left px-4 py-3 rounded-2xl border transition flex items-center justify-between gap-3
+              ${isCurrent
+                ? 'border-indigo-200 bg-indigo-50 cursor-default opacity-80'
+                : 'border-gray-100 hover:border-indigo-300 hover:bg-indigo-50/50 cursor-pointer'}">
+            <span class="text-sm font-medium text-gray-800">${s}</span>
+            ${isCurrent
+              ? '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Saat ini</span>'
+              : '<i class="fas fa-chevron-right text-gray-300 text-xs"></i>'}
+          </button>`;
+      }).join('');
+      document.getElementById('modalPindahTahap').classList.remove('hidden');
+      document.getElementById('modalPindahTahap').classList.add('flex');
+    }
+
+    function closePindahTahap() {
+      document.getElementById('modalPindahTahap').classList.add('hidden');
+      document.getElementById('modalPindahTahap').classList.remove('flex');
+    }
+
+    function confirmPindahTahap(newStage) {
+      const id = parseInt(document.getElementById('pindahTahapKandidatId').value);
+      closePindahTahap();
+      if (id && newStage) moveCandidateToStage(id, newStage);
     }
 
     function syncLowonganCounts() {
-      lowonganData.forEach(job => {
-        const related = kandidatData.filter(k => k.posisi === job.title);
-        job.counts = {
-          applied: related.filter(k => k.tahap === 'ER').length,
-          screening: related.filter(k => k.tahap === 'Screening').length,
-          interview: related.filter(k => k.tahap === 'Interview HR' || k.tahap === 'Interview User').length,
-          offer: related.filter(k => k.tahap === 'Offering').length,
-          hired: related.filter(k => k.tahap === 'Hired').length
-        };
-        job.kandidat = related.length;
-        // update percent kasar
-        const hired = job.counts.hired;
-        const offer = job.counts.offer;
-        const qty = Math.max(job.qty, 1);
-        job.percent = Math.min(100, Math.round((hired * 100 + offer * 70 + job.counts.interview * 50 + job.counts.screening * 25) / qty));
-
-        // Jika kebutuhan terpenuhi (hired >= qty) → progress 100% & status Closed
-        if (hired >= qty) {
-          job.percent = 100;
-          if (job.status !== 'Closed') {
-            const prev = job.status;
-            job.status = 'Closed';
-            job.lastUpdate = new Date().toISOString().slice(0, 10);
-            if (job.id) {
-              apiUpdate('lowongan', job.id, {
-                status: 'Closed',
-                percent: 100,
-                kandidat: job.kandidat,
-                lastUpdate: job.lastUpdate
-              }).catch(console.warn);
-            }
-            showToast(`Lowongan "${job.title}" ditutup otomatis (Hired ${hired}/${qty})`, 'success');
-          }
-        }
-      });
+      syncLowonganCountsFromData(true);
       renderLowongan();
     }
 
