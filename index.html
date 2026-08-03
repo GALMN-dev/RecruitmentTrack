@@ -236,8 +236,11 @@
             <h2 class="text-xl font-semibold text-gray-900" id="pageTitle">Dashboard</h2>
             <p class="text-sm text-gray-400 mt-0.5" id="pageSubtitle">Ringkasan rekrutmen hari ini</p>
           </div>
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-3">
             <span id="roleBadge" class="px-3.5 py-1.5 rounded-full text-xs font-semibold">—</span>
+            <button type="button" onclick="refreshData()" class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition" title="Refresh data dari spreadsheet">
+              <i id="refreshIcon" class="fas fa-sync-alt text-lg"></i>
+            </button>
             <button class="relative p-2 text-gray-400 hover:text-gray-600 transition" onclick="showNotifPanel()">
               <i class="fas fa-bell text-lg"></i>
               <span id="bellBadge" class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full hidden"></span>
@@ -390,6 +393,11 @@
                   <option>On Hold</option>
                   <option>Hired</option>
                   <option>Rejected</option>
+                </select>
+                <select id="filterKandidatRecruiter" onchange="applyKandidatFilter()" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white">
+                  <option value="">Semua Recruiter</option>
+                  <option>Febrinita</option>
+                  <option>Rifki</option>
                 </select>
               </div>
               <button onclick="openTambahKandidat()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-sm shadow-indigo-200 transition">
@@ -729,6 +737,10 @@
           </div>
         </div>
         <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Link CV</label>
+          <input type="url" id="newKanCv" placeholder="https://drive.google.com/... (opsional)" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Posisi *</label>
           <select id="newKanPosisi" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <option value="">Pilih posisi</option>
@@ -821,6 +833,13 @@
             <p id="detailKanSumber" class="text-sm text-gray-800">—</p>
           </div>
         </div>
+        <div id="detailKanCvWrap" class="hidden flex items-center gap-3 p-3 rounded-2xl bg-indigo-50 border border-indigo-100">
+          <div class="w-9 h-9 rounded-xl bg-white border border-indigo-100 flex items-center justify-center text-indigo-500"><i class="fas fa-file-alt text-sm"></i></div>
+          <div class="min-w-0 flex-1">
+            <p class="text-[10px] uppercase tracking-wide text-indigo-400 font-medium">CV</p>
+            <a id="detailKanCv" href="#" target="_blank" rel="noopener" class="text-sm text-indigo-600 hover:underline truncate block">Buka CV</a>
+          </div>
+        </div>
       </div>
       <div class="px-6 pb-6 flex gap-3">
         <a id="detailKanWhatsApp" href="#" target="_blank" rel="noopener" class="hidden flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 rounded-xl text-sm font-medium transition text-center">
@@ -857,6 +876,10 @@
             <label class="block text-sm font-medium text-gray-700 mb-1.5">No. Telepon</label>
             <input type="tel" id="editKanTelepon" placeholder="Opsional" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Link CV</label>
+          <input type="url" id="editKanCv" placeholder="https://drive.google.com/... (opsional)" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Posisi *</label>
@@ -1152,6 +1175,7 @@
               nama: row.nama || '',
               email: row.email || '',
               telepon: row.telepon || '',
+              cv: row.cv || '',
               posisi: row.posisi || '',
               sumber: row.sumber || '',
               tahap: row.tahap || 'ER',
@@ -1592,6 +1616,32 @@
       updateBadges();
       showPage('dashboard');
     }
+
+    async function refreshData() {
+      const icon = document.getElementById('refreshIcon');
+      if (icon) icon.classList.add('fa-spin');
+      showLoading('Menyinkronkan...', 'Memuat ulang data dari spreadsheet');
+      const result = await loadAllData();
+      hideLoading();
+      if (icon) icon.classList.remove('fa-spin');
+      if (!result || !result.ok) {
+        showAppAlert(
+          (result && result.error ? result.error + '\n\n' : '') +
+          'Gagal memuat ulang data dari spreadsheet.',
+          { title: 'Gagal refresh', type: 'error' }
+        );
+        return;
+      }
+      populateFilters();
+      renderLowongan();
+      renderKandidat();
+      renderPipeline();
+      renderInterview();
+      renderDashboard();
+      updateBadges();
+      applyKandidatFilter();
+      showToast('Data berhasil diperbarui dari spreadsheet', 'success');
+    }
     function logout() {
       document.getElementById('appPage').classList.remove('active');
       document.getElementById('landingPage').classList.add('active');
@@ -1688,6 +1738,7 @@
       const search = (document.getElementById('filterKandidatSearch')?.value || '').toLowerCase();
       const posisi = document.getElementById('filterKandidatPosisi')?.value || '';
       const tahap = document.getElementById('filterKandidatTahap')?.value || '';
+      const recruiter = document.getElementById('filterKandidatRecruiter')?.value || '';
       let data = [...kandidatData];
       if (search) data = data.filter(k =>
         k.nama.toLowerCase().includes(search) ||
@@ -1696,6 +1747,7 @@
       );
       if (posisi) data = data.filter(k => k.posisi === posisi);
       if (tahap) data = data.filter(k => k.tahap === tahap);
+      if (recruiter) data = data.filter(k => (k.recruiter || '') === recruiter);
       renderKandidat(data);
     }
 
@@ -1729,6 +1781,19 @@
       document.getElementById('detailKanExp').textContent = (k.exp != null ? k.exp : 0) + ' tahun';
       document.getElementById('detailKanRecruiter').textContent = k.recruiter || '—';
       document.getElementById('detailKanSumber').textContent = k.sumber || '—';
+      // CV link
+      const cvWrap = document.getElementById('detailKanCvWrap');
+      const cvLink = document.getElementById('detailKanCv');
+      if (k.cv && String(k.cv).trim()) {
+        cvLink.href = k.cv;
+        cvLink.textContent = 'Buka CV';
+        cvWrap.classList.remove('hidden');
+        cvWrap.classList.add('flex');
+      } else {
+        cvLink.href = '#';
+        cvWrap.classList.add('hidden');
+        cvWrap.classList.remove('flex');
+      }
       // WhatsApp button
       const waBtn = document.getElementById('detailKanWhatsApp');
       const phone = String(k.telepon || '').replace(/\D/g, '');
@@ -1764,6 +1829,7 @@
       document.getElementById('editKanNama').value = k.nama || '';
       document.getElementById('editKanEmail').value = k.email || '';
       document.getElementById('editKanTelepon').value = k.telepon || '';
+      document.getElementById('editKanCv').value = k.cv || '';
       const selPos = document.getElementById('editKanPosisi');
       const posisis = [...new Set([k.posisi, ...lowonganData.map(j => j.title)].filter(Boolean))];
       selPos.innerHTML = posisis.map(p => `<option value="${p}" ${p === k.posisi ? 'selected' : ''}>${p}</option>`).join('');
@@ -1791,6 +1857,7 @@
       k.nama = nama;
       k.email = document.getElementById('editKanEmail').value.trim();
       k.telepon = document.getElementById('editKanTelepon').value.trim();
+      k.cv = document.getElementById('editKanCv').value.trim();
       k.posisi = document.getElementById('editKanPosisi').value;
       k.sumber = document.getElementById('editKanSumber').value;
       k.exp = parseInt(document.getElementById('editKanExp').value) || 0;
@@ -1800,7 +1867,7 @@
       k.tahap = newTahap;
       k.initials = nama.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
       apiUpdate('kandidat', k.id, {
-        nama: k.nama, email: k.email, telepon: k.telepon, posisi: k.posisi,
+        nama: k.nama, email: k.email, telepon: k.telepon, cv: k.cv, posisi: k.posisi,
         sumber: k.sumber, exp: k.exp, recruiter: k.recruiter, tahap: k.tahap, initials: k.initials
       }).catch(console.warn);
       if (oldTahap !== newTahap) syncLowonganCounts();
@@ -1846,6 +1913,7 @@
         nama,
         email: document.getElementById('newKanEmail').value || '',
         telepon: document.getElementById('newKanTelepon').value || '',
+        cv: document.getElementById('newKanCv').value || '',
         posisi: posisi,
         sumber: document.getElementById('newKanSumber').value,
         tahap: 'ER',
@@ -1866,6 +1934,7 @@
       document.getElementById('newKanNama').value = '';
       document.getElementById('newKanEmail').value = '';
       document.getElementById('newKanTelepon').value = '';
+      document.getElementById('newKanCv').value = '';
     }
 
     async function deleteKandidat(id) {
@@ -2630,6 +2699,16 @@
         const cur = selPipe.value;
         selPipe.innerHTML = '<option value="">Semua Posisi</option>' + posisis.map(p => `<option>${p}</option>`).join('');
         selPipe.value = cur;
+      }
+      // recruiter options
+      const selRec = document.getElementById('filterKandidatRecruiter');
+      if (selRec) {
+        const cur = selRec.value;
+        const fromData = [...new Set(kandidatData.map(k => k.recruiter).filter(Boolean))];
+        const base = ['Febrinita', 'Rifki'];
+        const recruiters = [...new Set([...base, ...fromData])];
+        selRec.innerHTML = '<option value="">Semua Recruiter</option>' + recruiters.map(r => `<option>${r}</option>`).join('');
+        selRec.value = cur;
       }
     }
   </script>
